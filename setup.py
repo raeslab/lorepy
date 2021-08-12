@@ -15,12 +15,17 @@ setuptools.setup(
     project_urls={
         "Bug Tracker": "https://github.com/sepro/lorepy/issues",
     },
+    install_requires=[
+        "matplotlib>=3.4.1",
+        "numpy>=1.20.2",
+        "pandas>=1.2.4",
+        "scikit-learn>=0.24.1"
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
+    packages=setuptools.find_packages(where="lorepy"),
     python_requires=">=3.6",
 )

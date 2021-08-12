@@ -84,3 +84,20 @@ loreplot(data=iris_df, x="sepal width (cm)", y="species", scatter_kws=scatter_op
 plt.show()
 ```
 ![LoRePlot custom markers](./docs/img/loreplot_custom_markers.png)
+
+You can use LoRePlots in subplots as you would expect.
+
+```python
+fig, ax = plt.subplots(1,2, sharex=False, sharey=True)
+loreplot(data=iris_df, x="sepal width (cm)", y="species", ax=ax[0])
+loreplot(data=iris_df, x="petal width (cm)", y="species", ax=ax[1])
+
+ax[0].get_legend().remove()
+ax[0].set_title("Sepal Width")
+ax[1].set_title("Petal Width")
+
+plt.savefig('./docs/img/loreplot_subplot.png', dpi=150)
+plt.show()
+```
+
+![LoRePlot in subplots](./docs/img/loreplot_subplot.png.png)

@@ -35,6 +35,7 @@ def loreplot(
     y: str,
     add_dots: bool = True,
     scatter_kws: dict = dict({}),
+    ax=None,
     **kwargs
 ):
     """
@@ -47,6 +48,8 @@ def loreplot(
     :param kwargs:
     :return:
     """
+    if ax is None:
+        ax=plt.gca()
     tmp_df = data[[x, y]].dropna()
     X_reg = np.array(tmp_df[x]).reshape(-1, 1)
     y_reg = np.array(tmp_df[y])
@@ -58,7 +61,7 @@ def loreplot(
         kwargs["linestyle"] = 'None'
 
     area_df = _get_area_df(X_reg, lg, x)
-    area_df.plot.area(**kwargs)
+    area_df.plot.area(ax=ax, **kwargs)
 
     if add_dots:
         dot_df = _get_dots_df(X_reg, y_reg, lg, y)
@@ -66,7 +69,7 @@ def loreplot(
             scatter_kws["color"] = "w"
         if "alpha" not in scatter_kws.keys():
             scatter_kws["alpha"] = 0.3
-        plt.scatter(dot_df["x"], dot_df["y"], **scatter_kws)
+        ax.scatter(dot_df["x"], dot_df["y"], **scatter_kws)
 
-    plt.xlim(X_reg.min(), X_reg.max())
-    plt.ylim(0, 1)
+    ax.set_xlim(X_reg.min(), X_reg.max())
+    ax.set_ylim(0, 1)

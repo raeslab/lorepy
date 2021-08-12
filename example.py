@@ -38,3 +38,16 @@ scatter_options = {
 loreplot(data=iris_df, x="sepal width (cm)", y="species", scatter_kws=scatter_options)
 plt.savefig('./docs/img/loreplot_custom_markers.png', dpi=150)
 plt.show()
+
+# Test in subplots
+
+fig, ax = plt.subplots(1,2, sharex=False, sharey=True)
+loreplot(data=iris_df, x="sepal width (cm)", y="species", ax=ax[0])
+loreplot(data=iris_df, x="petal width (cm)", y="species", ax=ax[1])
+
+ax[0].get_legend().remove()
+ax[0].set_title("Sepal Width")
+ax[1].set_title("Petal Width")
+
+plt.savefig('./docs/img/loreplot_subplot.png', dpi=150)
+plt.show()
