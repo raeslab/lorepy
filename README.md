@@ -100,4 +100,4 @@ plt.savefig('./docs/img/loreplot_subplot.png', dpi=150)
 plt.show()
 ```
 
-![LoRePlot in subplots](./docs/img/loreplot_subplot.png.png)
+![LoRePlot in subplots](./docs/img/loreplot_subplot.png)
