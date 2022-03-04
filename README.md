@@ -7,9 +7,13 @@ continuous independent variable.
 
 ## Installation
 
-```shell
-pip install lorepy
+As lorepy currently isn't available on pipy copy the lorepy folder from the repository to your project folder. Or clone the
+repo and install from file using pip
+
 ```
+pip install git+file://c:/repo/directory
+```
+
 
 ## Usage
 
