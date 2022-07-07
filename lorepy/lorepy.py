@@ -35,7 +35,7 @@ def loreplot(
     x: str,
     y: str,
     add_dots: bool = True,
-    x_range: Optional[Tuple[int, int]] = None,
+    x_range: Optional[Tuple[float, float]] = None,
     scatter_kws: dict = dict({}),
     ax=None,
     **kwargs
