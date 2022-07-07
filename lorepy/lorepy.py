@@ -41,16 +41,16 @@ def loreplot(
     **kwargs
 ):
     """
+    Code to create a loreplot with a numerical feature on the x-axis and categorical y from a pandas dataset
 
-
-    :param data:
-    :param x:
-    :param y:
-    :param add_dots:
-    :type x_range: object
-    :param scatter_kws:
-    :param kwargs:
-    :return:
+    :param data: Pandas dataframe with data
+    :param x: Needs to be a numerical feature
+    :param y: Categorical feature
+    :param add_dots: Shows where true samples are in the plot
+    :param x_range: Either None (range will be selected automatically) or a tuple with min and max value for the x-axis
+    :param scatter_kws: Dictionary with keyword arguments to pass to the scatter function
+    :param ax: subplot to draw on, in case lorepy is used in a subplot
+    :param kwargs: Additional arguments to pass to pandas' plot.area function
     """
     if ax is None:
         ax=plt.gca()
