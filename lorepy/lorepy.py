@@ -2,10 +2,11 @@ from sklearn.linear_model import LogisticRegression
 from pandas import DataFrame
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Optional, Tuple
 
 
-def _get_area_df(X, lg, x_feature) -> DataFrame:
-    values = np.linspace(X.min(), X.max(), num=200)
+def _get_area_df(X, lg, x_feature, x_range) -> DataFrame:
+    values = np.linspace(X.min(), X.max(), num=200) if x_range is None else np.linspace(x_range[0], x_range[1], num=200)
     proba = lg.predict_proba(values.reshape(-1, 1))
     proba_df = DataFrame(proba, columns=lg.classes_)
     proba_df[x_feature] = values
@@ -34,16 +35,19 @@ def loreplot(
     x: str,
     y: str,
     add_dots: bool = True,
+    x_range: Optional[Tuple[int, int]] = None,
     scatter_kws: dict = dict({}),
     ax=None,
     **kwargs
 ):
     """
 
+
     :param data:
     :param x:
     :param y:
     :param add_dots:
+    :type x_range: object
     :param scatter_kws:
     :param kwargs:
     :return:
@@ -60,7 +64,7 @@ def loreplot(
     if "linestyle" not in kwargs.keys():
         kwargs["linestyle"] = 'None'
 
-    area_df = _get_area_df(X_reg, lg, x)
+    area_df = _get_area_df(X_reg, lg, x, x_range=x_range)
     area_df.plot.area(ax=ax, **kwargs)
 
     if add_dots:
