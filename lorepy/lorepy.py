@@ -6,7 +6,11 @@ from typing import Optional, Tuple
 
 
 def _get_area_df(X, lg, x_feature, x_range=None) -> DataFrame:
-    values = np.linspace(X.min(), X.max(), num=200) if x_range is None else np.linspace(x_range[0], x_range[1], num=200)
+    values = (
+        np.linspace(X.min(), X.max(), num=200)
+        if x_range is None
+        else np.linspace(x_range[0], x_range[1], num=200)
+    )
     proba = lg.predict_proba(values.reshape(-1, 1))
     proba_df = DataFrame(proba, columns=lg.classes_)
     proba_df[x_feature] = values
@@ -53,7 +57,7 @@ def loreplot(
     :param kwargs: Additional arguments to pass to pandas' plot.area function
     """
     if ax is None:
-        ax=plt.gca()
+        ax = plt.gca()
     tmp_df = data[[x, y]].dropna()
     X_reg = np.array(tmp_df[x]).reshape(-1, 1)
     y_reg = np.array(tmp_df[y])
@@ -62,7 +66,7 @@ def loreplot(
     lg.fit(X_reg, y_reg)
 
     if "linestyle" not in kwargs.keys():
-        kwargs["linestyle"] = 'None'
+        kwargs["linestyle"] = "None"
 
     area_df = _get_area_df(X_reg, lg, x, x_range=x_range)
     area_df.plot.area(ax=ax, **kwargs)
@@ -74,7 +78,6 @@ def loreplot(
         if "alpha" not in scatter_kws.keys():
             scatter_kws["alpha"] = 0.3
         ax.scatter(dot_df["x"], dot_df["y"], **scatter_kws)
-
 
     if x_range is None:
         ax.set_xlim(X_reg.min(), X_reg.max())

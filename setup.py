@@ -19,7 +19,7 @@ setuptools.setup(
         "matplotlib>=3.4.1",
         "numpy>=1.20.2",
         "pandas>=1.2.4",
-        "scikit-learn>=0.24.1"
+        "scikit-learn>=0.24.1",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
