@@ -17,7 +17,7 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Run tests
         run: |
-          pytest --exitfirst --verbose --failed-first --cov=lorepy --cov-report=term-missing --cov-report=xml tests/
+          pytest --exitfirst --verbose --failed-first --cov-report=term-missing --cov-report=xml tests/
       - name: Run tests
         run: |
           pip install genbadge[coverage]         
