@@ -14,11 +14,12 @@ jobs:
         with:
           python-version: "3.10"
           architecture: 'x64'
-      - run: pip install -r requirements.txt
+      - run: |
+          pip install -r requirements.txt
       - name: Run tests
         run: |
           pytest --exitfirst --verbose --failed-first --cov-report=term-missing --cov-report=xml tests/
-      - name: Run tests
+      - name: Generate Badge
         run: |
           pip install genbadge[coverage]         
           genbadge coverage -i coverage.xml
