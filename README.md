@@ -13,7 +13,7 @@ As lorepy currently isn't available on pipy copy the lorepy folder from the repo
 repo and install from file using pip
 
 ```
-pip install git+file://c:/repo/directory
+pip install lorepy
 ```
 
 
