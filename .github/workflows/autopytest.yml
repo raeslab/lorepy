@@ -23,7 +23,9 @@ jobs:
         run: |
           pip install genbadge[coverage]         
           genbadge coverage -i coverage.xml -o docs/coverage-badge.svg
-      - name: Update Coverage Badge
+      - run: git diff --exit-code ./docs/coverage-badge.svg
+      - name: Update Coverage Badge if needed
+        if: failure()
         run:
           git config --global user.name coverage_badge_update
           git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
