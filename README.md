@@ -1,3 +1,5 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 # lorepy: Logistic Regression Plots for Python
 
 Logistic Regression plots are used to plot the distribution of a categorical dependent variable in function of a 
