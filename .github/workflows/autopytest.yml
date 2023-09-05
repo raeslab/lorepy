@@ -17,12 +17,12 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Run tests
         run: |
-          pytest --exitfirst --verbose --failed-first --cov=lorepy tests/ --cov-report=term-missing --cov-report=xml
+          pytest --exitfirst --verbose --failed-first --cov=lorepy --cov-report=term-missing --cov-report=xml tests/
       - name: Run tests
         run: |
           pip install genbadge[coverage]         
           genbadge coverage -i coverage.xml
-      -name: Upload artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: code-coverage-badge
