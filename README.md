@@ -9,8 +9,7 @@ continuous independent variable.
 
 ## Installation
 
-As lorepy currently isn't available on pipy copy the lorepy folder from the repository to your project folder. Or clone the
-repo and install from file using pip
+Lorepy can be installed using pip using the command below.
 
 ```
 pip install lorepy
