@@ -11,9 +11,9 @@ setuptools.setup(
     description="Draw Logistic Regression Plots in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/sepro/lorepy",
+    url="https://github.com/raeslab/lorepy/",
     project_urls={
-        "Bug Tracker": "https://github.com/sepro/lorepy/issues",
+        "Bug Tracker": "https://github.com/raeslab/lorepy/issues",
     },
     install_requires=[
         "matplotlib>=3.4.1",
