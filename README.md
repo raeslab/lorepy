@@ -1,11 +1,11 @@
-[![Run Pytest](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml/badge.svg)](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml) [![Coverage](docs/coverage-badge.svg)](docs/coverage-badge.svg) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![DOI](https://zenodo.org/badge/686018963.svg)](https://zenodo.org/badge/latestdoi/686018963)
+[![Run Pytest](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml/badge.svg)](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml) [![Coverage](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/coverage-badge.svg)](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/coverage-badge.svg) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![DOI](https://zenodo.org/badge/686018963.svg)](https://zenodo.org/badge/latestdoi/686018963)
 
 # lorepy: Logistic Regression Plots for Python
 
 Logistic Regression plots are used to plot the distribution of a categorical dependent variable in function of a 
 continuous independent variable.
 
-![LoRePlot example on Iris Dataset](./docs/img/loreplot.png)
+![LoRePlot example on Iris Dataset](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot.png)
 
 ## Installation
 
@@ -56,7 +56,7 @@ loreplot(data=iris_df, x="sepal width (cm)", y="species", add_dots=False)
 plt.show()
 ```
 
-![LoRePlot dots can be disabled](./docs/img/loreplot_no_dots.png)
+![LoRePlot dots can be disabled](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_no_dots.png)
 
 ### Custom styles
 
@@ -72,7 +72,7 @@ colormap=ListedColormap(['red', 'green', 'blue'])
 loreplot(data=iris_df, x="sepal width (cm)", y="species", colormap=colormap)
 plt.show()
 ```
-![LoRePlot custom colors](./docs/img/loreplot_custom_color.png)
+![LoRePlot custom colors](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_custom_color.png)
 
 
 Using ```scatter_kws``` arguments for [pyplot.scatter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html)
@@ -89,7 +89,7 @@ scatter_options = {
 loreplot(data=iris_df, x="sepal width (cm)", y="species", scatter_kws=scatter_options)
 plt.show()
 ```
-![LoRePlot custom markers](./docs/img/loreplot_custom_markers.png)
+![LoRePlot custom markers](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_custom_markers.png)
 
 You can use LoRePlots in subplots as you would expect.
 
@@ -106,4 +106,4 @@ plt.savefig('./docs/img/loreplot_subplot.png', dpi=150)
 plt.show()
 ```
 
-![LoRePlot in subplots](./docs/img/loreplot_subplot.png)
+![LoRePlot in subplots](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_subplot.png)
