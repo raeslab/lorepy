@@ -1,7 +1,11 @@
 # GitHub Action that runs pytest
 
 name: Run Pytest
-on: [ push ]
+on:
+  push:
+  schedule:
+    # execute once a week on monday 
+    - cron:  '0 1 * * 1'
 jobs:
   build:
     runs-on: ubuntu-latest
