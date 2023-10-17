@@ -32,6 +32,7 @@ jobs:
           pytest --exitfirst --verbose --failed-first --cov=lorepy tests/ --cov-report=term-missing --cov-report=xml
       - name: Generate Coverage Badge
         run: |
+          pip install setuptools
           pip install genbadge[coverage]         
           genbadge coverage -i coverage.xml -o docs/coverage-badge.svg
       - run: git diff --exit-code ./docs/coverage-badge.svg
