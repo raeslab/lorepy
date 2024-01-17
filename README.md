@@ -106,3 +106,14 @@ plt.show()
 ```
 
 ![LoRePlot in subplots](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_subplot.png)
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+  * Found a bug or have some suggestions? Open an [issue](https://github.com/raeslab/lorepy/issues).
+  * Pull requests are welcome! Though open an [issue](https://github.com/raeslab/lorepy/issues) first to discuss which features/changes you wish to implement.
+
+## Contact
+
+lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at the [RaesLab](https://raeslab.sites.vib.be/en) and was based on R code written by [Sara Vieira-Silva](https://saravsilva.github.io/).
