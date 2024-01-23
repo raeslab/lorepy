@@ -5,6 +5,8 @@
 Logistic Regression plots are used to plot the distribution of a categorical dependent variable in function of a 
 continuous independent variable.
 
+If you prefer an R implementation of this package, have a look at [loreplotr](https://github.com/raeslab/loreplotr).
+
 ![LoRePlot example on Iris Dataset](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot.png)
 
 ## Installation
