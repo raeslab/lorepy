@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Proost"
+  given-names: "Sebastian"
+  orcid: "https://orcid.org/0000-0002-6792-9442"
+- family-names: "Vieira-Silva"
+  given-names: "Sara"
+  orcid: "https://orcid.org/0000-0002-4616-7602"
+- family-names: "Raes"
+  given-names: "Jeroen"
+  orcid: "https://orcid.org/0000-0002-1337-041X"
+title: "lorepy: Logistic Regression Plots for Python"
+version: 0.1.1
+doi: 10.5281/zenodo.8324902
+date-released: 2023-09-07
+url: "https://github.com/raeslab/lorepy"
