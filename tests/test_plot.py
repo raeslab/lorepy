@@ -2,6 +2,7 @@ import pandas as pd
 from pandas import DataFrame
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
 from lorepy.lorepy import loreplot, _get_dots_df, _get_area_df
@@ -16,6 +17,18 @@ df = pd.DataFrame({"x": X, "y": y})
 # Test case for loreplot with default parameters
 def test_loreplot_default():
     loreplot(df, "x", "y")  ## first test without specifying the axis
+
+    fig, ax = plt.subplots()
+    loreplot(df, "x", "y", ax=ax)
+    assert ax.get_title() == ""
+    assert ax.get_xlabel() == "x"
+    assert ax.get_ylabel() == ""
+
+
+# Test case for loreplot with custom clf
+def test_loreplot_custom_clf():
+    svc = SVC(probability=True)
+    loreplot(df, "x", "y", clf=svc)
 
     fig, ax = plt.subplots()
     loreplot(df, "x", "y", ax=ax)
