@@ -132,7 +132,7 @@ plt.savefig("./docs/img/loreplot_other_clf.png", dpi=150)
 plt.show()
 ```
 
-[Lorepy with different types of classifiers](./docs/img/loreplot_other_clf.png)
+![Lorepy with different types of classifiers](./docs/img/loreplot_other_clf.png)
 
 ## Contributing
 
@@ -143,4 +143,11 @@ Any contributions you make are **greatly appreciated**.
 
 ## Contact
 
-lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at the [RaesLab](https://raeslab.sites.vib.be/en) and was based on R code written by [Sara Vieira-Silva](https://saravsilva.github.io/). As of version 0.2.0 lorepy is available under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) license.
+lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at the 
+[RaesLab](https://raeslab.sites.vib.be/en) and was based on R code written by 
+[Sara Vieira-Silva](https://saravsilva.github.io/). As of version 0.2.0 lorepy is available under the 
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) 
+license. For commercial access inquiries, please contact [Jeroen Raes](mailto:jeroen.raes@kuleuven.vib.be).
+
+
+
