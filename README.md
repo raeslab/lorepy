@@ -125,6 +125,7 @@ rf = RandomForestClassifier(n_estimators=10, max_depth=2)
 loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=svc, ax=ax[0])
 loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=rf, ax=ax[1])
 
+ax[0].get_legend().remove()
 ax[0].set_title("SVC")
 ax[1].set_title("RF")
 
@@ -147,7 +148,6 @@ lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at
 [RaesLab](https://raeslab.sites.vib.be/en) and was based on R code written by 
 [Sara Vieira-Silva](https://saravsilva.github.io/). As of version 0.2.0 lorepy is available under the 
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) 
-license. For commercial access inquiries, please contact [Jeroen Raes](mailto:jeroen.raes@kuleuven.vib.be).
+license. 
 
-
-
+For commercial access inquiries, please contact [Jeroen Raes](mailto:jeroen.raes@kuleuven.vib.be).

@@ -65,6 +65,7 @@ rf = RandomForestClassifier(n_estimators=10, max_depth=2)
 loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=svc, ax=ax[0])
 loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=rf, ax=ax[1])
 
+ax[0].get_legend().remove()
 ax[0].set_title("SVC")
 ax[1].set_title("RF")
 
