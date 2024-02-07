@@ -135,6 +135,10 @@ plt.show()
 
 ![Lorepy with different types of classifiers](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_other_clf.png)
 
+## Development
+
+Additional [documentation for developers](./docs/dev_docs.md) is included with details on running tests, building and deploying to PyPi.
+
 ## Contributing
 
 Any contributions you make are **greatly appreciated**.
