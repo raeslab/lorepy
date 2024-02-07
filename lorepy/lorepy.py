@@ -42,6 +42,7 @@ def loreplot(
     x_range: Optional[Tuple[float, float]] = None,
     scatter_kws: dict = dict({}),
     ax=None,
+    clf=None,
     **kwargs
 ):
     """
@@ -54,6 +55,7 @@ def loreplot(
     :param x_range: Either None (range will be selected automatically) or a tuple with min and max value for the x-axis
     :param scatter_kws: Dictionary with keyword arguments to pass to the scatter function
     :param ax: subplot to draw on, in case lorepy is used in a subplot
+    :param clf: provide a different scikit-learn classifier for the function. Should implement the predict_proba() and fit()
     :param kwargs: Additional arguments to pass to pandas' plot.area function
     """
     if ax is None:
@@ -62,7 +64,7 @@ def loreplot(
     X_reg = np.array(tmp_df[x]).reshape(-1, 1)
     y_reg = np.array(tmp_df[y])
 
-    lg = LogisticRegression(multi_class="multinomial")
+    lg = LogisticRegression(multi_class="multinomial") if clf is None else clf
     lg.fit(X_reg, y_reg)
 
     if "linestyle" not in kwargs.keys():

@@ -52,3 +52,22 @@ ax[1].set_title("Petal Width")
 
 plt.savefig("./docs/img/loreplot_subplot.png", dpi=150)
 plt.show()
+
+# Basic Lore Plot with default style but different classifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+
+fig, ax = plt.subplots(1, 2, sharex=False, sharey=True)
+
+svc = SVC(probability=True)
+rf = RandomForestClassifier(n_estimators=10, max_depth=2)
+
+loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=svc, ax=ax[0])
+loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=rf, ax=ax[1])
+
+ax[0].get_legend().remove()
+ax[0].set_title("SVC")
+ax[1].set_title("RF")
+
+plt.savefig("./docs/img/loreplot_other_clf.png", dpi=150)
+plt.show()

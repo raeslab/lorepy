@@ -1,4 +1,4 @@
-[![Run Pytest](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml/badge.svg)](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml) [![Coverage](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/coverage-badge.svg)](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/coverage-badge.svg) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![DOI](https://zenodo.org/badge/686018963.svg)](https://zenodo.org/badge/latestdoi/686018963) [![PyPI version](https://badge.fury.io/py/lorepy.svg)](https://badge.fury.io/py/lorepy)
+[![Run Pytest](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml/badge.svg)](https://github.com/raeslab/lorepy/actions/workflows/autopytest.yml) [![Coverage](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/coverage-badge.svg)](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/coverage-badge.svg) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![DOI](https://zenodo.org/badge/686018963.svg)](https://zenodo.org/badge/latestdoi/686018963) [![PyPI version](https://badge.fury.io/py/lorepy.svg)](https://badge.fury.io/py/lorepy) [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 # lorepy: Logistic Regression Plots for Python
 
@@ -109,13 +109,45 @@ plt.show()
 
 ![LoRePlot in subplots](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_subplot.png)
 
+By default lorepy uses a multi-class logistic regression model, however this can be replaced with any classifier
+from scikit-learn that implements ```predict_proba``` and ```fit```. Below you can see the code and output with a
+Support Vector Classifier (SVC) and Random Forest Classifier (RF).
+
+```python
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+
+fig, ax = plt.subplots(1, 2, sharex=False, sharey=True)
+
+svc = SVC(probability=True)
+rf = RandomForestClassifier(n_estimators=10, max_depth=2)
+
+loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=svc, ax=ax[0])
+loreplot(data=iris_df, x="sepal width (cm)", y="species", clf=rf, ax=ax[1])
+
+ax[0].get_legend().remove()
+ax[0].set_title("SVC")
+ax[1].set_title("RF")
+
+plt.savefig("./docs/img/loreplot_other_clf.png", dpi=150)
+plt.show()
+```
+
+![Lorepy with different types of classifiers](./docs/img/loreplot_other_clf.png)
+
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Any contributions you make are **greatly appreciated**.
 
   * Found a bug or have some suggestions? Open an [issue](https://github.com/raeslab/lorepy/issues).
   * Pull requests are welcome! Though open an [issue](https://github.com/raeslab/lorepy/issues) first to discuss which features/changes you wish to implement.
 
 ## Contact
 
-lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at the [RaesLab](https://raeslab.sites.vib.be/en) and was based on R code written by [Sara Vieira-Silva](https://saravsilva.github.io/).
+lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at the 
+[RaesLab](https://raeslab.sites.vib.be/en) and was based on R code written by 
+[Sara Vieira-Silva](https://saravsilva.github.io/). As of version 0.2.0 lorepy is available under the 
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) 
+license. 
+
+For commercial access inquiries, please contact [Jeroen Raes](mailto:jeroen.raes@kuleuven.vib.be).
