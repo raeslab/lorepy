@@ -133,7 +133,7 @@ plt.savefig("./docs/img/loreplot_other_clf.png", dpi=150)
 plt.show()
 ```
 
-![Lorepy with different types of classifiers](./docs/img/loreplot_other_clf.png)
+![Lorepy with different types of classifiers](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_other_clf.png)
 
 ## Contributing
 
