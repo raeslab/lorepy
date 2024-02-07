@@ -23,9 +23,9 @@ setuptools.setup(
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: Other/Proprietary License :: CC BY-NC-SA 4.0 International",
         "Operating System :: OS Independent",
     ],
+    license="Creative Commons Attribution-NonCommercial-ShareAlike 4.0. https://creativecommons.org/licenses/by-nc-sa/4.0/",
     packages=setuptools.find_packages(where="lorepy"),
     python_requires=">=3.8",
 )
