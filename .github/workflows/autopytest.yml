@@ -30,7 +30,7 @@ jobs:
           pip install pytest-cov
       - name: Run tests
         run: |
-          pytest --exitfirst --verbose --failed-first --cov=lorepy tests/ --cov-report=term-missing --cov-report=xml
+          pytest --exitfirst --verbose --failed-first --cov=src tests/ --cov-report=term-missing --cov-report=xml
       - name: Generate Coverage Badge
         run: |
           pip install setuptools
