@@ -1,6 +1,6 @@
 # Updates the timestamp monthly so tests keep working
 
-name: Run Pytest
+name: Update Timestamp
 on:
   workflow_dispatch:
   schedule:

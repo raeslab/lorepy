@@ -1,6 +1,6 @@
-# GitHub Action that runs pytest with the oldest packages specified
+# GitHub Action that runs pytest with the oldest packages specified in setup.py
 
-name: Run Pytest
+name: Run Legacy Pytest
 on:
   workflow_dispatch:
   push:
