@@ -1,0 +1,25 @@
+# Updates the timestamp monthly so tests keep working
+
+name: Update Timestamp
+on:
+  workflow_dispatch:
+  schedule:
+    # Execute the first of every month
+    - cron:  '1 0 1 * *'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with: # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
+          ref: ${{ github.head_ref }}
+      - run: |
+          date > timestamp
+      - name: Commit new timestamp
+        run:
+          git config --global user.name update_timestamp
+          git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
+          git add timestamp
+          git commit -m "updated timestamp"
+          git push
