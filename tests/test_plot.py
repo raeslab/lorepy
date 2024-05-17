@@ -10,13 +10,25 @@ from lorepy.lorepy import loreplot, _get_dots_df, _get_area_df
 # Generate a sample dataset for testing
 X = np.concatenate([np.random.randint(0, 10, 50), np.random.randint(2, 12, 50)])
 y = [0] * 50 + [1] * 50
+z = X
 
-df = pd.DataFrame({"x": X, "y": y})
+df = pd.DataFrame({"x": X, "y": y, "z": z})
 
 
 # Test case for loreplot with default parameters
 def test_loreplot_default():
     loreplot(df, "x", "y")  ## first test without specifying the axis
+
+    fig, ax = plt.subplots()
+    loreplot(df, "x", "y", ax=ax)
+    assert ax.get_title() == ""
+    assert ax.get_xlabel() == "x"
+    assert ax.get_ylabel() == ""
+
+
+# Test case for loreplot with confounder
+def test_loreplot_default():
+    loreplot(df, "x", "y", confounders=[("z", 1)])  ## first test without specifying the axis
 
     fig, ax = plt.subplots()
     loreplot(df, "x", "y", ax=ax)
