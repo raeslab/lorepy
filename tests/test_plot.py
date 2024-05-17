@@ -83,7 +83,7 @@ def test_get_dots_df():
 
 # Test case for _get_area_df
 def test_get_area_df():
-    area_df = _get_area_df(X_reg, lg, "x", (X_reg.min(), X_reg.max()))
+    area_df = _get_area_df(lg, "x", (X_reg.min(), X_reg.max()))
     assert isinstance(area_df, DataFrame)
     assert "x" not in area_df.columns
     assert 0 in area_df.columns
