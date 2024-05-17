@@ -72,12 +72,12 @@ ax[1].set_title("RF")
 plt.savefig("./docs/img/loreplot_other_clf.png", dpi=150)
 plt.show()
 
-
-# Basic Lore Plot with default style
+# Basic Lore Plot with default style with one confounder
 loreplot(
     data=iris_df,
     x="sepal width (cm)",
     y="species",
-    deconfound=[("petal width (cm)", 1)],
+    confounders=[("petal width (cm)", 1)],
 )
+plt.savefig("./docs/img/loreplot_confounder.png", dpi=150)
 plt.show()

@@ -22,11 +22,11 @@ def _get_area_df(lg, x_feature, x_range, deconfound=[]) -> DataFrame:
     return proba_df
 
 
-def _get_dots_df(X, y, lg, y_feature, deconfound=[]) -> DataFrame:
+def _get_dots_df(X, y, lg, y_feature, confounders=[]) -> DataFrame:
     output = []
 
     for v, s in zip(X, y):
-        proba = lg.predict_proba([v] + [i[1] for i in deconfound])
+        proba = lg.predict_proba([v] + [i[1] for i in confounders])
         i = list(lg.classes_).index(s)
         min_value = sum(proba[0][:i])
         max_value = sum(proba[0][: i + 1])
@@ -46,7 +46,7 @@ def loreplot(
     scatter_kws: dict = dict({}),
     ax=None,
     clf=None,
-    deconfound=[],
+    confounders=[],
     **kwargs
 ):
     """
@@ -60,13 +60,13 @@ def loreplot(
     :param scatter_kws: Dictionary with keyword arguments to pass to the scatter function
     :param ax: subplot to draw on, in case lorepy is used in a subplot
     :param clf: provide a different scikit-learn classifier for the function. Should implement the predict_proba() and fit()
-    :param deconfound: list of tuples with the feature and reference value e.g. [("BMI", 25)] will deconfound BMI and use a refernce of 25 for plots
+    :param confounders: list of tuples with the feature and reference value e.g. [("BMI", 25)] will confounders BMI and use a reference of 25 for plots
     :param kwargs: Additional arguments to pass to pandas' plot.area function
     """
     if ax is None:
         ax = plt.gca()
 
-    x_features = [x] + [i[0] for i in deconfound]
+    x_features = [x] + [i[0] for i in confounders]
 
     tmp_df = data[x_features + [y]].dropna()
     X_reg = np.array(tmp_df[x_features])
@@ -81,10 +81,10 @@ def loreplot(
     if "linestyle" not in kwargs.keys():
         kwargs["linestyle"] = "None"
 
-    area_df = _get_area_df(lg, x, x_range, deconfound=deconfound)
+    area_df = _get_area_df(lg, x, x_range, deconfound=confounders)
     area_df.plot.area(ax=ax, **kwargs)
 
-    if add_dots and len(deconfound) == 0:
+    if add_dots and len(confounders) == 0:
         dot_df = _get_dots_df(X_reg, y_reg, lg, y)
         if "color" not in scatter_kws.keys():
             scatter_kws["color"] = "w"
