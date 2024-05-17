@@ -46,7 +46,7 @@ def loreplot(
     scatter_kws: dict = dict({}),
     ax=None,
     clf=None,
-    deconfound= [],
+    deconfound=[],
     **kwargs
 ):
     """
