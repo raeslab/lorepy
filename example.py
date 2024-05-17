@@ -74,5 +74,10 @@ plt.show()
 
 
 # Basic Lore Plot with default style
-loreplot(data=iris_df, x="sepal width (cm)", y="species", deconfound=[("petal width (cm)", 1)])
+loreplot(
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+    deconfound=[("petal width (cm)", 1)],
+)
 plt.show()
