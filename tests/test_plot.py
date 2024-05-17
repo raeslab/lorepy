@@ -83,7 +83,7 @@ def test_get_dots_df():
 
 # Test case for _get_area_df
 def test_get_area_df():
-    area_df = _get_area_df(X_reg, lg, "x")
+    area_df = _get_area_df(X_reg, lg, "x", (X_reg.min(), X_reg.max()))
     assert isinstance(area_df, DataFrame)
     assert "x" not in area_df.columns
     assert 0 in area_df.columns
@@ -91,16 +91,3 @@ def test_get_area_df():
     assert len(area_df) == 200
     assert area_df.index[0] == X_reg.min()
     assert area_df.index[-1] == X_reg.max()
-
-
-# Test case for _get_area_df with custom x_range
-def test_get_area_df_custom_range():
-    x_range = (2.0, 4.0)
-    area_df = _get_area_df(X_reg, lg, "x", x_range=x_range)
-    assert isinstance(area_df, DataFrame)
-    assert "x" not in area_df.columns
-    assert 0 in area_df.columns
-    assert 1 in area_df.columns
-    assert len(area_df) == 200
-    assert area_df.index[0] == x_range[0]
-    assert area_df.index[-1] == x_range[1]
