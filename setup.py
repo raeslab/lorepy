@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="lorepy",
-    version="0.2.1",
+    version="0.3.0",
     author="Sebastian Proost",
     author_email="sebastian.proost@gmail.com",
     description="Draw Logistic Regression Plots in Python",

@@ -135,6 +135,24 @@ plt.show()
 
 ![Lorepy with different types of classifiers](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_other_clf.png)
 
+
+In case there are confounders, these can be taken into account using the ```confounders``` argument. This requires a
+list of tuples, with the feature and the reference value for that feature to use in plots. E.g. if you wish to deconfound
+for Body Mass Index (BMI) and use a BMI of 25 in plots, set this to [("BMI", 25)].
+
+```python
+loreplot(
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+    confounders=[("petal width (cm)", 1)],
+)
+plt.savefig("./docs/img/loreplot_confounder.png", dpi=150)
+plt.show()
+```
+
+![Loreplot with a confounder](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_confounder.png)
+
 ## Development
 
 Additional [documentation for developers](./docs/dev_docs.md) is included with details on running tests, building and deploying to PyPi.
