@@ -16,7 +16,7 @@ pytest
 To enable coverage stats run the command below.
 
 ```python
-pytest --exitfirst --verbose --failed-first --cov=lorepy
+pytest --exitfirst --verbose --failed-first --cov=src
 ```
 
 ## Deploying on PyPi
