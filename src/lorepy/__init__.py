@@ -1,1 +1,1 @@
-from .lorepy import loreplot
+from .lorepy import loreplot, uncertainty_plot

@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 from pandas import DataFrame
 import numpy as np
 import matplotlib.pyplot as plt
@@ -95,3 +96,33 @@ def loreplot(
     ax.set_xlim(*x_range)
 
     ax.set_ylim(0, 1)
+
+
+def uncertainty_plot(data: DataFrame,
+    x: str,
+    y: str, jackknife_fraction=0.8, jackknife_iterations=100):
+
+    x_features = [x]
+
+    tmp_df = data[x_features + [y]].dropna()
+    X_reg = np.array(tmp_df[x_features])
+    y_reg = np.array(tmp_df[y])
+
+    x_range = (X_reg[:, 0].min(), X_reg[:, 0].max())
+
+    areas = []
+    for i in range(jackknife_iterations):
+        X_keep, _, y_keep, _ = train_test_split(X_reg, y_reg, train_size=jackknife_fraction)
+
+        lg = LogisticRegression(multi_class="multinomial")
+        lg.fit(X_keep, y_keep)
+        new_area = _get_area_df(lg, x, x_range).reset_index()
+        # new_area["iteration"] = i + 1
+        areas.append(new_area)
+
+    long_df = pd.concat(areas).melt(id_vars=[x]).sort_values(x)
+
+    # output = long_df.groupby([x, "variable"]).agg(
+    #     pd.NamedAgg(min=min))
+
+    return long_df
