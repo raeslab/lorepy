@@ -98,9 +98,9 @@ def loreplot(
     ax.set_ylim(0, 1)
 
 
-def uncertainty_plot(data: DataFrame,
-    x: str,
-    y: str, jackknife_fraction=0.8, jackknife_iterations=100):
+def uncertainty_plot(
+    data: DataFrame, x: str, y: str, jackknife_fraction=0.8, jackknife_iterations=100
+):
 
     x_features = [x]
 
@@ -112,7 +112,9 @@ def uncertainty_plot(data: DataFrame,
 
     areas = []
     for i in range(jackknife_iterations):
-        X_keep, _, y_keep, _ = train_test_split(X_reg, y_reg, train_size=jackknife_fraction)
+        X_keep, _, y_keep, _ = train_test_split(
+            X_reg, y_reg, train_size=jackknife_fraction
+        )
 
         lg = LogisticRegression(multi_class="multinomial")
         lg.fit(X_keep, y_keep)
