@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 from typing import Optional, Tuple
 
 
-def _get_area_df(lg, x_feature, x_range, deconfound=[]) -> DataFrame:
+def _get_area_df(lg, x_feature, x_range, confounders=[]) -> DataFrame:
     values = np.linspace(x_range[0], x_range[1], num=200)
 
     predict_df = pd.DataFrame({"values": values})
 
-    for k, v in deconfound:
+    for k, v in confounders:
         predict_df[k] = v
 
     proba = lg.predict_proba(predict_df.values)
@@ -81,7 +81,7 @@ def loreplot(
     if "linestyle" not in kwargs.keys():
         kwargs["linestyle"] = "None"
 
-    area_df = _get_area_df(lg, x, x_range, deconfound=confounders)
+    area_df = _get_area_df(lg, x, x_range, confounders=confounders)
     area_df.plot.area(ax=ax, **kwargs)
 
     if add_dots and len(confounders) == 0:
