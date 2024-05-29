@@ -27,7 +27,7 @@ def test_loreplot_default():
 
 
 # Test case for loreplot with confounder
-def test_loreplot_default():
+def test_loreplot_confounder():
     loreplot(
         df, "x", "y", confounders=[("z", 1)]
     )  # first test without specifying the axis

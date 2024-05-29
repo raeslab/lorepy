@@ -2,6 +2,9 @@ from lorepy import loreplot
 
 from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 
 # Load iris dataset and convert to dataframe
@@ -16,7 +19,6 @@ plt.savefig("./docs/img/loreplot.png", dpi=150)
 plt.show()
 
 # Key word arguments (like colormap) can be passed to the DataFrame.plot.area
-from matplotlib.colors import ListedColormap
 
 colormap = ListedColormap(["red", "green", "blue"])
 loreplot(data=iris_df, x="sepal width (cm)", y="species", colormap=colormap)
@@ -54,9 +56,6 @@ plt.savefig("./docs/img/loreplot_subplot.png", dpi=150)
 plt.show()
 
 # Basic Lore Plot with default style but different classifier
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-
 fig, ax = plt.subplots(1, 2, sharex=False, sharey=True)
 
 svc = SVC(probability=True)

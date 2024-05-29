@@ -2,6 +2,8 @@ from lorepy import uncertainty_plot
 
 from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from sklearn.svm import SVC
 import pandas as pd
 
 # Load iris dataset and convert to dataframe
@@ -27,7 +29,7 @@ plt.savefig("./docs/img/uncertainty_jackknife.png", dpi=150)
 plt.show()
 
 # Uncertainty plot with custom colors
-from matplotlib.colors import ListedColormap
+
 
 colormap = ListedColormap(["red", "green", "blue"])
 uncertainty_plot(
@@ -54,8 +56,6 @@ plt.savefig("./docs/img/uncertainty_confounder.png", dpi=150)
 plt.show()
 
 # Uncertainty plot with a custom classifier
-from sklearn.svm import SVC
-
 svc = SVC(probability=True)
 
 uncertainty_plot(
