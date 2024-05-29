@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from sklearn.svm import SVC
 
-from lorepy.lorepy import uncertainty_plot
+from lorepy import uncertainty_plot
 
 # Generate a sample dataset for testing
 X = np.concatenate([np.random.randint(0, 10, 50), np.random.randint(2, 12, 50)])
