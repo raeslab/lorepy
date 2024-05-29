@@ -1,2 +1,2 @@
-from .lorepy import loreplot
-from .uncertainty import uncertainty_plot
+from .lorepy import loreplot as loreplot
+from .uncertainty import uncertainty_plot as uncertainty_plot
