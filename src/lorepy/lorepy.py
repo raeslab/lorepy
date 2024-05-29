@@ -61,7 +61,7 @@ def loreplot(
     ax=None,
     clf=None,
     confounders=[],
-    **kwargs
+    **kwargs,
 ):
     """
     Code to create a loreplot with a numerical feature on the v-axis and categorical y from a pandas dataset
@@ -108,19 +108,25 @@ def loreplot(
 
 
 def _get_uncertainty_data(
-    x: str, X_reg, y_reg, x_range, mode='resample', jackknife_fraction: float = 0.8, iterations: int = 100
+    x: str,
+    X_reg,
+    y_reg,
+    x_range,
+    mode="resample",
+    jackknife_fraction: float = 0.8,
+    iterations: int = 100,
 ):
 
     areas = []
     for i in range(iterations):
-        if mode == 'jackknife':
+        if mode == "jackknife":
             X_keep, _, y_keep, _ = train_test_split(
                 X_reg, y_reg, train_size=jackknife_fraction
             )
-        elif mode == 'resample':
+        elif mode == "resample":
             X_keep, y_keep = resample(X_reg, y_reg, replace=True)
         else:
-            raise f'Mode {mode} is unsupported, only jackknife and resample are valid modes'
+            raise f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
 
         lg = LogisticRegression(multi_class="multinomial")
         lg.fit(X_keep, y_keep)
@@ -130,29 +136,50 @@ def _get_uncertainty_data(
 
     long_df = pd.concat(areas).melt(id_vars=[x]).sort_values(x)
 
-    output = long_df.groupby([x, "variable"]).agg(
-        min=pd.NamedAgg(column="value", aggfunc="min"),
-        mean=pd.NamedAgg(column="value", aggfunc="mean"),
-        max=pd.NamedAgg(column="value", aggfunc="max"),
-        low_95=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 2.5)),
-        high_95=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 97.5)),
-        low_50=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 25)),
-        high_50=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 75))
-    ).reset_index()
+    output = (
+        long_df.groupby([x, "variable"])
+        .agg(
+            min=pd.NamedAgg(column="value", aggfunc="min"),
+            mean=pd.NamedAgg(column="value", aggfunc="mean"),
+            max=pd.NamedAgg(column="value", aggfunc="max"),
+            low_95=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 2.5)),
+            high_95=pd.NamedAgg(
+                column="value", aggfunc=lambda v: np.percentile(v, 97.5)
+            ),
+            low_50=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 25)),
+            high_50=pd.NamedAgg(column="value", aggfunc=lambda v: np.percentile(v, 75)),
+        )
+        .reset_index()
+    )
 
     return output
 
 
 def uncertainty_plot(
-    data: DataFrame, x: str, y: str, x_range=None, mode='resample', jackknife_fraction=0.8, iterations=100, confounders=[],
-        colormap=None
+    data: DataFrame,
+    x: str,
+    y: str,
+    x_range=None,
+    mode="resample",
+    jackknife_fraction=0.8,
+    iterations=100,
+    confounders=[],
+    colormap=None,
 ):
     X_reg, y_reg, r = _prepare_data(data, x, y, confounders)
 
     if x_range is None:
         x_range = r
 
-    plot_df = _get_uncertainty_data(x, X_reg, y_reg, x_range, mode=mode, jackknife_fraction=jackknife_fraction, iterations=iterations)
+    plot_df = _get_uncertainty_data(
+        x,
+        X_reg,
+        y_reg,
+        x_range,
+        mode=mode,
+        jackknife_fraction=jackknife_fraction,
+        iterations=iterations,
+    )
 
     categories = plot_df.variable.unique()
 
@@ -163,8 +190,12 @@ def uncertainty_plot(
     for idx, category in enumerate(categories):
         cat_df = plot_df[plot_df.variable == category]
 
-        axs[idx].fill_between(cat_df[x], cat_df["low_95"], cat_df["high_95"], alpha=0.1, color=cmap(idx))
-        axs[idx].fill_between(cat_df[x], cat_df["low_50"], cat_df["high_50"], alpha=0.2, color=cmap(idx))
+        axs[idx].fill_between(
+            cat_df[x], cat_df["low_95"], cat_df["high_95"], alpha=0.1, color=cmap(idx)
+        )
+        axs[idx].fill_between(
+            cat_df[x], cat_df["low_50"], cat_df["high_50"], alpha=0.2, color=cmap(idx)
+        )
         axs[idx].plot(cat_df[x], cat_df["mean"], color=cmap(idx))
         axs[idx].set_title(categories[idx])
         axs[idx].set_xlabel(x)

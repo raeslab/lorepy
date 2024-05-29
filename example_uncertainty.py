@@ -15,7 +15,7 @@ iris_df["species"] = [iris_obj.target_names[s] for s in iris_obj.target]
 # )
 
 uncertainty_plot(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode='resample'
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample"
 )
 
 plt.show()
