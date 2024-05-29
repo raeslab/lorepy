@@ -1,11 +1,10 @@
-import pandas as pd
-from pandas import DataFrame
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from lorepy.lorepy import _get_area_df, _get_dots_df, loreplot
+from pandas import DataFrame
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
-import matplotlib.pyplot as plt
-
-from lorepy.lorepy import loreplot, _get_dots_df, _get_area_df
 
 # Generate a sample dataset for testing
 X = np.concatenate([np.random.randint(0, 10, 50), np.random.randint(2, 12, 50)])

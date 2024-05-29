@@ -1,10 +1,9 @@
-from lorepy import uncertainty_plot
-
-from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-from sklearn.svm import SVC
 import pandas as pd
+from lorepy import uncertainty_plot
+from matplotlib.colors import ListedColormap
+from sklearn.datasets import load_iris
+from sklearn.svm import SVC
 
 # Load iris dataset and convert to dataframe
 iris_obj = load_iris()

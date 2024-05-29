@@ -1,10 +1,9 @@
+import numpy as np
 import pandas as pd
 import pytest
-import numpy as np
+from lorepy import uncertainty_plot
 from matplotlib.colors import ListedColormap
 from sklearn.svm import SVC
-
-from lorepy import uncertainty_plot
 
 # Generate a sample dataset for testing
 X = np.concatenate([np.random.randint(0, 10, 50), np.random.randint(2, 12, 50)])

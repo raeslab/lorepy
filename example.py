@@ -1,11 +1,10 @@
-from lorepy import loreplot
-
-from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
+from lorepy import loreplot
+from matplotlib.colors import ListedColormap
+from sklearn.datasets import load_iris
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 # Load iris dataset and convert to dataframe
 iris_obj = load_iris()

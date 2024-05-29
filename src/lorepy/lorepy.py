@@ -1,9 +1,10 @@
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from pandas import DataFrame
-import numpy as np
-import matplotlib.pyplot as plt
 from typing import Optional, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from pandas import DataFrame
+from sklearn.linear_model import LogisticRegression
 
 
 def _prepare_data(data, x, y, confounders):
