@@ -103,5 +103,3 @@ def loreplot(
     ax.set_xlim(*x_range)
 
     ax.set_ylim(0, 1)
-
-
