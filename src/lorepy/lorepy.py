@@ -115,7 +115,7 @@ def _get_uncertainty_data(
     mode="resample",
     jackknife_fraction: float = 0.8,
     iterations: int = 100,
-    confounders=[]
+    confounders=[],
 ):
     areas = []
     for i in range(iterations):
@@ -181,7 +181,7 @@ def uncertainty_plot(
         mode=mode,
         jackknife_fraction=jackknife_fraction,
         iterations=iterations,
-        confounders=confounders
+        confounders=confounders,
     )
 
     categories = plot_df.variable.unique()
