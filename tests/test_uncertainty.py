@@ -30,7 +30,9 @@ def test_uncertainty_default():
 def test_uncertainty_alternative():
     svc = SVC(probability=True)
 
-    fig, axs = uncertainty_plot(df, "x", "y", mode='jackknife', x_range=(5, 40), colormap=colormap, clf=svc)
+    fig, axs = uncertainty_plot(
+        df, "x", "y", mode="jackknife", x_range=(5, 40), colormap=colormap, clf=svc
+    )
 
     assert len(axs) == 2
     assert axs[0].get_title() == "0"
@@ -41,5 +43,4 @@ def test_uncertainty_alternative():
 # Test error handling when an unsupported mode is selected
 def test_uncertainty_incorrect_mode():
     with pytest.raises(NotImplementedError):
-        assert uncertainty_plot(df, "x", "y", mode='fail')
-
+        assert uncertainty_plot(df, "x", "y", mode="fail")

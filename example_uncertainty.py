@@ -34,6 +34,11 @@ from sklearn.svm import SVC
 svc = SVC(probability=True)
 
 uncertainty_plot(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", clf=svc
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+    iterations=100,
+    mode="resample",
+    clf=svc,
 )
 plt.show()

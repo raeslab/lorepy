@@ -116,7 +116,7 @@ def _get_uncertainty_data(
     jackknife_fraction: float = 0.8,
     iterations: int = 100,
     confounders=[],
-    clf=None
+    clf=None,
 ):
     areas = []
     for i in range(iterations):
@@ -168,7 +168,7 @@ def uncertainty_plot(
     iterations=100,
     confounders=[],
     colormap=None,
-    clf=None
+    clf=None,
 ):
     X_reg, y_reg, r = _prepare_data(data, x, y, confounders)
 
@@ -184,7 +184,7 @@ def uncertainty_plot(
         jackknife_fraction=jackknife_fraction,
         iterations=iterations,
         confounders=confounders,
-        clf=clf
+        clf=clf,
     )
 
     categories = plot_df.variable.unique()
