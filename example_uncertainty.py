@@ -25,7 +25,15 @@ iris_df["species"] = [iris_obj.target_names[s] for s in iris_obj.target]
 #     data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", colormap=colormap,
 # )
 
+# uncertainty_plot(
+#     data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", confounders=[("petal width (cm)", 1)]
+# )
+
+from sklearn.svm import SVC
+
+svc = SVC(probability=True)
+
 uncertainty_plot(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", confounders=[("petal width (cm)", 1)]
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", clf=svc
 )
 plt.show()

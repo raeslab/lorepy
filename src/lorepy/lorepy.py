@@ -115,7 +115,8 @@ def _get_uncertainty_data(
     mode="resample",
     jackknife_fraction: float = 0.8,
     iterations: int = 100,
-    confounders=[]
+    confounders=[],
+    clf=None
 ):
     areas = []
     for i in range(iterations):
@@ -130,7 +131,7 @@ def _get_uncertainty_data(
                 f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
             )
 
-        lg = LogisticRegression(multi_class="multinomial")
+        lg = LogisticRegression(multi_class="multinomial") if clf is None else clf
         lg.fit(X_keep, y_keep)
         new_area = _get_area_df(lg, x, x_range, confounders=confounders).reset_index()
 
@@ -167,6 +168,7 @@ def uncertainty_plot(
     iterations=100,
     confounders=[],
     colormap=None,
+    clf=None
 ):
     X_reg, y_reg, r = _prepare_data(data, x, y, confounders)
 
@@ -181,7 +183,8 @@ def uncertainty_plot(
         mode=mode,
         jackknife_fraction=jackknife_fraction,
         iterations=iterations,
-        confounders=confounders
+        confounders=confounders,
+        clf=clf
     )
 
     categories = plot_df.variable.unique()

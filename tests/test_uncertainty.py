@@ -2,6 +2,8 @@ import pandas as pd
 import pytest
 import numpy as np
 from matplotlib.colors import ListedColormap
+from sklearn.svm import SVC
+
 from lorepy.lorepy import uncertainty_plot
 
 # Generate a sample dataset for testing
@@ -26,7 +28,9 @@ def test_uncertainty_default():
 
 # Test case for lorepy's uncertainty plot with alternative parameters
 def test_uncertainty_alternative():
-    fig, axs = uncertainty_plot(df, "x", "y", mode='jackknife', x_range=(5, 40), colormap=colormap)
+    svc = SVC(probability=True)
+
+    fig, axs = uncertainty_plot(df, "x", "y", mode='jackknife', x_range=(5, 40), colormap=colormap, clf=svc)
 
     assert len(axs) == 2
     assert axs[0].get_title() == "0"
