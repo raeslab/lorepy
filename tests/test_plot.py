@@ -17,7 +17,7 @@ df = pd.DataFrame({"x": X, "y": y, "z": z})
 
 # Test case for loreplot with default parameters
 def test_loreplot_default():
-    loreplot(df, "x", "y")  ## first test without specifying the axis
+    loreplot(df, "x", "y")  # first test without specifying the axis
 
     fig, ax = plt.subplots()
     loreplot(df, "x", "y", ax=ax)
@@ -30,7 +30,7 @@ def test_loreplot_default():
 def test_loreplot_default():
     loreplot(
         df, "x", "y", confounders=[("z", 1)]
-    )  ## first test without specifying the axis
+    )  # first test without specifying the axis
 
     fig, ax = plt.subplots()
     loreplot(df, "x", "y", ax=ax)

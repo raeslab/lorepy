@@ -6,12 +6,24 @@ import matplotlib.pyplot as plt
 from typing import Optional, Tuple
 
 
-def _get_area_df(lg, x_feature, x_range, deconfound=[]) -> DataFrame:
+def _prepare_data(data, x, y, confounders):
+    x_features = [x] + [i[0] for i in confounders]
+
+    tmp_df = data[x_features + [y]].dropna()
+    X_reg = np.array(tmp_df[x_features])
+    y_reg = np.array(tmp_df[y])
+
+    x_range = (X_reg[:, 0].min(), X_reg[:, 0].max())
+
+    return X_reg, y_reg, x_range
+
+
+def _get_area_df(lg, x_feature, x_range, confounders=[]) -> DataFrame:
     values = np.linspace(x_range[0], x_range[1], num=200)
 
     predict_df = pd.DataFrame({"values": values})
 
-    for k, v in deconfound:
+    for k, v in confounders:
         predict_df[k] = v
 
     proba = lg.predict_proba(predict_df.values)
@@ -25,14 +37,14 @@ def _get_area_df(lg, x_feature, x_range, deconfound=[]) -> DataFrame:
 def _get_dots_df(X, y, lg, y_feature, confounders=[]) -> DataFrame:
     output = []
 
-    for v, s in zip(X, y):
-        proba = lg.predict_proba([v] + [i[1] for i in confounders])
+    for x, s in zip(X, y):
+        proba = lg.predict_proba([x] + [i[1] for i in confounders])
         i = list(lg.classes_).index(s)
         min_value = sum(proba[0][:i])
         max_value = sum(proba[0][: i + 1])
         margin = (max_value - min_value) / 10
         ypos = np.random.uniform(low=min_value + margin, high=max_value - margin)
-        output.append({y_feature: s, "x": v[0], "y": ypos})
+        output.append({y_feature: s, "x": x[0], "y": ypos})
 
     return DataFrame(output)
 
@@ -47,16 +59,16 @@ def loreplot(
     ax=None,
     clf=None,
     confounders=[],
-    **kwargs
+    **kwargs,
 ):
     """
-    Code to create a loreplot with a numerical feature on the x-axis and categorical y from a pandas dataset
+    Code to create a loreplot with a numerical feature on the v-axis and categorical y from a pandas dataset
 
     :param data: Pandas dataframe with data
     :param x: Needs to be a numerical feature
     :param y: Categorical feature
     :param add_dots: Shows where true samples are in the plot (cannot be enabled when deconfounding for additional variables)
-    :param x_range: Either None (range will be selected automatically) or a tuple with min and max value for the x-axis
+    :param x_range: Either None (range will be selected automatically) or a tuple with min and max value for the v-axis
     :param scatter_kws: Dictionary with keyword arguments to pass to the scatter function
     :param ax: subplot to draw on, in case lorepy is used in a subplot
     :param clf: provide a different scikit-learn classifier for the function. Should implement the predict_proba() and fit()
@@ -66,14 +78,10 @@ def loreplot(
     if ax is None:
         ax = plt.gca()
 
-    x_features = [x] + [i[0] for i in confounders]
-
-    tmp_df = data[x_features + [y]].dropna()
-    X_reg = np.array(tmp_df[x_features])
-    y_reg = np.array(tmp_df[y])
+    X_reg, y_reg, r = _prepare_data(data, x, y, confounders)
 
     if x_range is None:
-        x_range = (X_reg[:, 0].min(), X_reg[:, 0].max())
+        x_range = r
 
     lg = LogisticRegression(multi_class="multinomial") if clf is None else clf
     lg.fit(X_reg, y_reg)
@@ -81,7 +89,7 @@ def loreplot(
     if "linestyle" not in kwargs.keys():
         kwargs["linestyle"] = "None"
 
-    area_df = _get_area_df(lg, x, x_range, deconfound=confounders)
+    area_df = _get_area_df(lg, x, x_range, confounders=confounders)
     area_df.plot.area(ax=ax, **kwargs)
 
     if add_dots and len(confounders) == 0:

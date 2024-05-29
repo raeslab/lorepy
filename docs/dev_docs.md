@@ -3,19 +3,25 @@
 ## Setting up the environment
 
 To recreate the environment used by the devs, you can get a [requirements.txt](./dev/requirements.txt) file that has the
-same versions we have been using pinned.
+same versions we have been using pinned. To install these after creating a virtual environment use the command below
+(from the root of the project)
+
+```bash
+pip install -r ./docs/dev/requirements.txt
+```
+
 
 ## Running tests
 
 Lorepy is fully covered with unit-tests, to run them you need the pytest package installed (```pip install pytest pytest-cov```).
 Next, run the command below to run the test suite. Note: if you use the environment listed above you will get these.
 
-```python
+```bash
 pytest
 ```
 To enable coverage stats run the command below.
 
-```python
+```bash
 pytest --exitfirst --verbose --failed-first --cov=src
 ```
 

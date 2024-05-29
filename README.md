@@ -153,6 +153,30 @@ plt.show()
 
 ![Loreplot with a confounder](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_confounder.png)
 
+### Assess uncertainty
+
+From loreplots it isn't possible to assess how certain we are of the prevalence of each group across the range. To
+provide a view into this there is a function ```uncertainty_plot```, which can be used as shown below. This will use
+```resampling``` (or ```jackknifing```) to determine the 50% and 95% interval of predicted values and show these in a
+multi-panel plot with one plot per category.
+
+```python
+from lorepy import uncertainty_plot
+
+uncertainty_plot(
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+)
+plt.savefig("./docs/img/uncertainty_default.png", dpi=150)
+plt.show()
+```
+
+![Default uncertainty plot](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/uncertainty_default.png)
+
+This also supports custom colors, ranges and classifiers. More examples are available in ```example_uncertainty.py```.
+
+
 ## Development
 
 Additional [documentation for developers](./docs/dev_docs.md) is included with details on running tests, building and deploying to PyPi.
