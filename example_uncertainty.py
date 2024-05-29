@@ -14,8 +14,14 @@ iris_df["species"] = [iris_obj.target_names[s] for s in iris_obj.target]
 #     data=iris_df, x="sepal width (cm)", y="species", iterations=100, jackknife_fraction=0.8
 # )
 
-uncertainty_plot(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample"
-)
+# uncertainty_plot(
+#     data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample"
+# )
 
+from matplotlib.colors import ListedColormap
+
+colormap = ListedColormap(["red", "green", "blue"])
+uncertainty_plot(
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", colormap=colormap,
+)
 plt.show()
