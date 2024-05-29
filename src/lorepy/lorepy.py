@@ -39,14 +39,14 @@ def _get_area_df(lg, x_feature, x_range, confounders=[]) -> DataFrame:
 def _get_dots_df(X, y, lg, y_feature, confounders=[]) -> DataFrame:
     output = []
 
-    for v, s in zip(X, y):
-        proba = lg.predict_proba([v] + [i[1] for i in confounders])
+    for x, s in zip(X, y):
+        proba = lg.predict_proba([x] + [i[1] for i in confounders])
         i = list(lg.classes_).index(s)
         min_value = sum(proba[0][:i])
         max_value = sum(proba[0][: i + 1])
         margin = (max_value - min_value) / 10
         ypos = np.random.uniform(low=min_value + margin, high=max_value - margin)
-        output.append({y_feature: s, "v": v[0], "y": ypos})
+        output.append({y_feature: s, "x": x[0], "y": ypos})
 
     return DataFrame(output)
 
@@ -100,7 +100,7 @@ def loreplot(
             scatter_kws["color"] = "w"
         if "alpha" not in scatter_kws.keys():
             scatter_kws["alpha"] = 0.3
-        ax.scatter(dot_df["v"], dot_df["y"], **scatter_kws)
+        ax.scatter(dot_df["x"], dot_df["y"], **scatter_kws)
 
     ax.set_xlim(*x_range)
 
