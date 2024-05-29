@@ -22,6 +22,11 @@ from matplotlib.colors import ListedColormap
 
 colormap = ListedColormap(["red", "green", "blue"])
 uncertainty_plot(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="resample", colormap=colormap,
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+    iterations=100,
+    mode="resample",
+    colormap=colormap,
 )
 plt.show()

@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 import numpy as np
 from matplotlib.colors import ListedColormap
+
 colormap = ListedColormap(["red", "green", "blue"])
 
 from lorepy.lorepy import uncertainty_plot
@@ -26,7 +27,9 @@ def test_uncertainty_default():
 
 # Test case for lorepy's uncertainty plot with alternative parameters
 def test_uncertainty_alternative():
-    fig, axs = uncertainty_plot(df, "x", "y", mode='jackknife', x_range=(5, 40), colormap=colormap)
+    fig, axs = uncertainty_plot(
+        df, "x", "y", mode="jackknife", x_range=(5, 40), colormap=colormap
+    )
 
     assert len(axs) == 2
     assert axs[0].get_title() == "0"
@@ -37,5 +40,4 @@ def test_uncertainty_alternative():
 # Test error handling when an unsupported mode is selected
 def test_uncertainty_incorrect_mode():
     with pytest.raises(NotImplementedError):
-        assert uncertainty_plot(df, "x", "y", mode='fail')
-
+        assert uncertainty_plot(df, "x", "y", mode="fail")

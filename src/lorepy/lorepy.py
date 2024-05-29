@@ -126,7 +126,9 @@ def _get_uncertainty_data(
         elif mode == "resample":
             X_keep, y_keep = resample(X_reg, y_reg, replace=True)
         else:
-            raise NotImplementedError(f"Mode {mode} is unsupported, only jackknife and resample are valid modes")
+            raise NotImplementedError(
+                f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
+            )
 
         lg = LogisticRegression(multi_class="multinomial")
         lg.fit(X_keep, y_keep)
