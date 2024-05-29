@@ -115,8 +115,8 @@ def _get_uncertainty_data(
     mode="resample",
     jackknife_fraction: float = 0.8,
     iterations: int = 100,
+    confounders=[]
 ):
-
     areas = []
     for i in range(iterations):
         if mode == "jackknife":
@@ -130,7 +130,7 @@ def _get_uncertainty_data(
 
         lg = LogisticRegression(multi_class="multinomial")
         lg.fit(X_keep, y_keep)
-        new_area = _get_area_df(lg, x, x_range).reset_index()
+        new_area = _get_area_df(lg, x, x_range, confounders=confounders).reset_index()
 
         areas.append(new_area)
 
@@ -179,6 +179,7 @@ def uncertainty_plot(
         mode=mode,
         jackknife_fraction=jackknife_fraction,
         iterations=iterations,
+        confounders=confounders
     )
 
     categories = plot_df.variable.unique()

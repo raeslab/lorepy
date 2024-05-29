@@ -2,8 +2,6 @@ import pandas as pd
 import pytest
 import numpy as np
 from matplotlib.colors import ListedColormap
-colormap = ListedColormap(["red", "green", "blue"])
-
 from lorepy.lorepy import uncertainty_plot
 
 # Generate a sample dataset for testing
@@ -12,6 +10,8 @@ y = [0] * 50 + [1] * 50
 z = X
 
 df = pd.DataFrame({"x": X, "y": y, "z": z})
+
+colormap = ListedColormap(["red", "green", "blue"])
 
 
 # Test case for lorepy's uncertainty plot with default parameters
