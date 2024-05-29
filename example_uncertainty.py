@@ -10,7 +10,12 @@ iris_df = pd.DataFrame(iris_obj.data, columns=iris_obj.feature_names)
 
 iris_df["species"] = [iris_obj.target_names[s] for s in iris_obj.target]
 
-test = uncertainty_plot(
-    data=iris_df, x="sepal width (cm)", y="species", jackknife_iterations=2
+# uncertainty_plot(
+#     data=iris_df, x="sepal width (cm)", y="species", iterations=100, jackknife_fraction=0.8
+# )
+
+uncertainty_plot(
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode='resample'
 )
-print(test)
+
+plt.show()
