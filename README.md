@@ -153,6 +153,21 @@ plt.show()
 
 ![Loreplot with a confounder](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_confounder.png)
 
+In some cases the numerical feature on the x-axis isn't continuous (e.g. an integer number), this can lead to 
+overplotting the dots. To avoid this to some extent a `jitter` feature is included, that adds some uniform noise to
+the x-coordinates of the dots. The value specifies the range of the uniform noise added, the value of 0.05 in the 
+example sets this range to [-0.05, 0.05].
+
+```python
+iris_df["sepal width (cm)"] = (
+    np.round(iris_df["sepal width (cm)"] * 3) / 3
+)  # Round values
+
+loreplot(data=iris_df, x="sepal width (cm)", y="species", jitter=0.05)
+plt.savefig("./docs/img/loreplot_jitter.png", dpi=150)
+plt.show()
+```
+
 ### Assess uncertainty
 
 From loreplots it isn't possible to assess how certain we are of the prevalence of each group across the range. To
