@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from lorepy import loreplot
 from matplotlib.colors import ListedColormap
 from sklearn.datasets import load_iris
@@ -78,4 +79,13 @@ loreplot(
     confounders=[("petal width (cm)", 1)],
 )
 plt.savefig("./docs/img/loreplot_confounder.png", dpi=150)
+plt.show()
+
+# Basic Lore Plot with some jitter
+iris_df["sepal width (cm)"] = (
+    np.round(iris_df["sepal width (cm)"] * 3) / 3
+)  # Round values
+
+loreplot(data=iris_df, x="sepal width (cm)", y="species", jitter=0.05)
+plt.savefig("./docs/img/loreplot_jitter.png", dpi=150)
 plt.show()

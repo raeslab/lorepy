@@ -25,6 +25,17 @@ def test_loreplot_default():
     assert ax.get_ylabel() == ""
 
 
+# Test case for loreplot with jitter
+def test_loreplot_jitter():
+    loreplot(df, "x", "y")  # first test without specifying the axis
+
+    fig, ax = plt.subplots()
+    loreplot(df, "x", "y", ax=ax, jitter=0.05)
+    assert ax.get_title() == ""
+    assert ax.get_xlabel() == "x"
+    assert ax.get_ylabel() == ""
+
+
 # Test case for loreplot with confounder
 def test_loreplot_confounder():
     loreplot(

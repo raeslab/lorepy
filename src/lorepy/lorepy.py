@@ -35,10 +35,13 @@ def _get_area_df(lg, x_feature, x_range, confounders=[]) -> DataFrame:
     return proba_df
 
 
-def _get_dots_df(X, y, lg, y_feature, confounders=[]) -> DataFrame:
+def _get_dots_df(X, y, lg, y_feature, confounders=[], jitter=0) -> DataFrame:
     output = []
 
     for x, s in zip(X, y):
+        if jitter != 0:
+            x[0] += np.random.uniform(low=-jitter, high=jitter)
+
         proba = lg.predict_proba([x] + [i[1] for i in confounders])
         i = list(lg.classes_).index(s)
         min_value = sum(proba[0][:i])
@@ -60,6 +63,7 @@ def loreplot(
     ax=None,
     clf=None,
     confounders=[],
+    jitter=0,
     **kwargs,
 ):
     """
@@ -74,6 +78,7 @@ def loreplot(
     :param ax: subplot to draw on, in case lorepy is used in a subplot
     :param clf: provide a different scikit-learn classifier for the function. Should implement the predict_proba() and fit()
     :param confounders: list of tuples with the feature and reference value e.g. [("BMI", 25)] will confounders BMI and use a reference of 25 for plots
+    :param jitter: adds random noise to the x-position of dots. This can help avoid overplotting when integer values are used for the numerical features
     :param kwargs: Additional arguments to pass to pandas' plot.area function
     """
     if ax is None:
@@ -94,7 +99,7 @@ def loreplot(
     area_df.plot.area(ax=ax, **kwargs)
 
     if add_dots and len(confounders) == 0:
-        dot_df = _get_dots_df(X_reg, y_reg, lg, y)
+        dot_df = _get_dots_df(X_reg, y_reg, lg, y, jitter=jitter)
         if "color" not in scatter_kws.keys():
             scatter_kws["color"] = "w"
         if "alpha" not in scatter_kws.keys():
