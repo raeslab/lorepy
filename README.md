@@ -167,6 +167,7 @@ loreplot(data=iris_df, x="sepal width (cm)", y="species", jitter=0.05)
 plt.savefig("./docs/img/loreplot_jitter.png", dpi=150)
 plt.show()
 ```
+![Loreplot with a confounder](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_jitter.png)
 
 ### Assess uncertainty
 
