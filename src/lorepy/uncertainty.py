@@ -17,9 +17,11 @@ def _get_uncertainty_data(
     mode="resample",
     jackknife_fraction: float = 0.8,
     iterations: int = 100,
-    confounders=[],
+    confounders=None,
     clf=None,
 ):
+    if confounders is None:
+        confounders = []
     areas = []
     for i in range(iterations):
         if mode == "jackknife":
