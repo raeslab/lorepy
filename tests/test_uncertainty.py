@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from lorepy import uncertainty_plot
+from lorepy.uncertainty import _get_uncertainty_data
 from matplotlib.colors import ListedColormap
 from sklearn.svm import SVC
 
@@ -32,6 +33,15 @@ def test_uncertainty_alternative():
     fig, axs = uncertainty_plot(
         df, "x", "y", mode="jackknife", x_range=(5, 40), colormap=colormap, clf=svc
     )
+
+    assert len(axs) == 2
+    assert axs[0].get_title() == "0"
+    assert axs[0].get_xlabel() == "x"
+    assert axs[0].get_ylabel() == ""
+
+
+def test_get_uncertainty_confounder():
+    fig, axs = uncertainty_plot(df, "x", "y", confounders=[("z", 5)])  # first test with default params
 
     assert len(axs) == 2
     assert axs[0].get_title() == "0"
