@@ -9,6 +9,14 @@ If you prefer an R implementation of this package, have a look at [loreplotr](ht
 
 ![LoRePlot example on Iris Dataset](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot.png)
 
+## Why use lorepy ?
+
+Lorepy offers distinct advantages over traditional methods like stacked bar plots. By employing a linear model, Lorepy 
+captures overall trends across the entire feature range. It avoids arbitrary cut-offs and segmentation, enabling the 
+visualization of uncertainty throughout the data range.
+
+You can find examples of the Iris data visualized using stacked bar plots [here](./docs/lorepy_vs_bar_plots.md) for comparison.
+
 ## Installation
 
 Lorepy can be installed using pip using the command below.

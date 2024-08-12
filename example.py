@@ -89,3 +89,81 @@ iris_df["sepal width (cm)"] = (
 loreplot(data=iris_df, x="sepal width (cm)", y="species", jitter=0.05)
 plt.savefig("./docs/img/loreplot_jitter.png", dpi=150)
 plt.show()
+
+### Generate some plots that can be used for the documentation
+
+iris_obj = load_iris()
+iris_df = pd.DataFrame(iris_obj.data, columns=iris_obj.feature_names)
+
+iris_df["species"] = [iris_obj.target_names[s] for s in iris_obj.target]
+
+iris_df["sepal_group"] = iris_df["sepal width (cm)"].apply(
+    lambda x: "small" if x < 3 else "large"
+)
+count_df = (
+    iris_df.groupby(["species", "sepal_group"], as_index=False)
+    .size()
+    .pivot_table(index="sepal_group", columns="species", values="size")
+)
+
+totals = count_df.sum(axis=1)
+
+count_df = count_df.div(totals, axis=0).sort_index(ascending=False)
+count_df.plot.bar(stacked=True)
+
+plt.tight_layout()
+plt.savefig("./docs/img/threshold.png", dpi=150)
+plt.show()
+
+iris_df["sepal_bin"] = pd.cut(iris_df["sepal width (cm)"], 6)
+count_df = (
+    iris_df.groupby(["species", "sepal_bin"], as_index=False)
+    .size()
+    .pivot_table(index="sepal_bin", columns="species", values="size")
+)
+
+label_df = iris_df.groupby("sepal_bin", as_index=False).size()
+label_df["label"] = label_df.apply(
+    lambda x: str(x["sepal_bin"]) + " (n=" + str(x["size"]) + ")", axis=1
+)
+
+totals = count_df.sum(axis=1)
+
+count_df = count_df.div(totals, axis=0).sort_index(ascending=True)
+count_df = (
+    pd.merge(count_df, label_df, left_index=True, right_on="sepal_bin")
+    .set_index("label")
+    .drop(columns=["sepal_bin", "size"])
+)
+count_df.plot.bar(stacked=True)
+
+plt.tight_layout()
+plt.savefig("./docs/img/bins.png", dpi=150)
+plt.show()
+
+
+iris_df["sepal_cut"] = pd.qcut(iris_df["sepal width (cm)"], 6, duplicates="drop")
+count_df = (
+    iris_df.groupby(["species", "sepal_cut"], as_index=False)
+    .size()
+    .pivot_table(index="sepal_cut", columns="species", values="size")
+)
+
+label_df = iris_df.groupby("sepal_cut", as_index=False).size()
+label_df["label"] = label_df.apply(
+    lambda x: str(x["sepal_cut"]) + " (n=" + str(x["size"]) + ")", axis=1
+)
+
+totals = count_df.sum(axis=1)
+
+count_df = count_df.div(totals, axis=0).sort_index(ascending=True)
+count_df = (
+    pd.merge(count_df, label_df, left_index=True, right_on="sepal_cut")
+    .set_index("label")
+    .drop(columns=["sepal_cut", "size"])
+)
+count_df.plot.bar(stacked=True)
+
+plt.tight_layout()
+plt.savefig("./docs/img/percentiles.png", dpi=150)
+plt.show()
