@@ -20,8 +20,8 @@ def _get_uncertainty_data(
     confounders=None,
     clf=None,
 ):
-    if confounders is None:
-        confounders = []
+    confounders = [] if confounders is None else confounders
+
     areas = []
     for i in range(iterations):
         if mode == "jackknife":
