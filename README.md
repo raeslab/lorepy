@@ -203,7 +203,7 @@ This also supports custom colors, ranges and classifiers. More examples are avai
 
 ## Development
 
-Additional [documentation for developers](./docs/dev_docs.md) is included with details on running tests, building and deploying to PyPi.
+Additional [documentation for developers](https://github.com/raeslab/lorepy/blob/main/docs/dev_docs.md) is included with details on running tests, building and deploying to PyPi.
 
 ## Contributing
 
