@@ -40,7 +40,9 @@ def test_uncertainty_alternative():
 
 
 def test_get_uncertainty_confounder():
-    fig, axs = uncertainty_plot(df, "x", "y", confounders=[("z", 5)])  # first test with default params
+    fig, axs = uncertainty_plot(
+        df, "x", "y", confounders=[("z", 5)]
+    )  # first test with default params
 
     assert len(axs) == 2
     assert axs[0].get_title() == "0"
