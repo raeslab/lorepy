@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import pytest
 from lorepy import uncertainty_plot
-from lorepy.uncertainty import _get_uncertainty_data
 from matplotlib.colors import ListedColormap
 from sklearn.svm import SVC
 
