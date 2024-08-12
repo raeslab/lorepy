@@ -15,7 +15,7 @@ Lorepy offers distinct advantages over traditional methods like stacked bar plot
 captures overall trends across the entire feature range. It avoids arbitrary cut-offs and segmentation, enabling the 
 visualization of uncertainty throughout the data range.
 
-You can find examples of the Iris data visualized using stacked bar plots [here](./docs/lorepy_vs_bar_plots.md) for comparison.
+You can find examples of the Iris data visualized using stacked bar plots [here](https://github.com/raeslab/lorepy/blob/main/docs/lorepy_vs_bar_plots.md) for comparison.
 
 ## Installation
 
