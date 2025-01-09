@@ -28,5 +28,5 @@ setup(
     license="Creative Commons Attribution-NonCommercial-ShareAlike 4.0. https://creativecommons.org/licenses/by-nc-sa/4.0/",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    python_requires=">=3.8",
+    python_requires=">=3.9",
 )
