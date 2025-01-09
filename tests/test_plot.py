@@ -6,66 +6,78 @@ from pandas import DataFrame
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
-# Generate a sample dataset for testing
-X = np.concatenate([np.random.randint(0, 10, 50), np.random.randint(2, 12, 50)])
-y = [0] * 50 + [1] * 50
-z = X
+import pytest
 
-df = pd.DataFrame({"x": X, "y": y, "z": z})
+
+@pytest.fixture
+def sample_data():
+    X = np.concatenate([np.random.randint(0, 10, 50), np.random.randint(2, 12, 50)])
+    y = [0] * 50 + [1] * 50
+    z = X
+    return pd.DataFrame({"x": X, "y": y, "z": z})
+
+
+@pytest.fixture
+def logistic_regression_model():
+    X_reg = np.array([1.0, 2.0, 3.0, 4.0, 5.0]).reshape(-1, 1)
+    y_reg = np.array([0, 1, 0, 1, 1])
+    lg = LogisticRegression()
+    lg.fit(X_reg, y_reg)
+    return X_reg, y_reg, lg
 
 
 # Test case for loreplot with default parameters
-def test_loreplot_default():
-    loreplot(df, "x", "y")  # first test without specifying the axis
+def test_loreplot_default(sample_data):
+    loreplot(sample_data, "x", "y")  # first test without specifying the axis
 
     fig, ax = plt.subplots()
-    loreplot(df, "x", "y", ax=ax)
+    loreplot(sample_data, "x", "y", ax=ax)
     assert ax.get_title() == ""
     assert ax.get_xlabel() == "x"
     assert ax.get_ylabel() == ""
 
 
 # Test case for loreplot with jitter
-def test_loreplot_jitter():
-    loreplot(df, "x", "y")  # first test without specifying the axis
+def test_loreplot_jitter(sample_data):
+    loreplot(sample_data, "x", "y")  # first test without specifying the axis
 
     fig, ax = plt.subplots()
-    loreplot(df, "x", "y", ax=ax, jitter=0.05)
+    loreplot(sample_data, "x", "y", ax=ax, jitter=0.05)
     assert ax.get_title() == ""
     assert ax.get_xlabel() == "x"
     assert ax.get_ylabel() == ""
 
 
 # Test case for loreplot with confounder
-def test_loreplot_confounder():
+def test_loreplot_confounder(sample_data):
     loreplot(
-        df, "x", "y", confounders=[("z", 1)]
+        sample_data, "x", "y", confounders=[("z", 1)]
     )  # first test without specifying the axis
 
     fig, ax = plt.subplots()
-    loreplot(df, "x", "y", ax=ax)
+    loreplot(sample_data, "x", "y", ax=ax)
     assert ax.get_title() == ""
     assert ax.get_xlabel() == "x"
     assert ax.get_ylabel() == ""
 
 
 # Test case for loreplot with custom clf
-def test_loreplot_custom_clf():
+def test_loreplot_custom_clf(sample_data):
     svc = SVC(probability=True)
-    loreplot(df, "x", "y", clf=svc)
+    loreplot(sample_data, "x", "y", clf=svc)
 
     fig, ax = plt.subplots()
-    loreplot(df, "x", "y", ax=ax)
+    loreplot(sample_data, "x", "y", ax=ax)
     assert ax.get_title() == ""
     assert ax.get_xlabel() == "x"
     assert ax.get_ylabel() == ""
 
 
 # Test case for loreplot with custom parameters
-def test_loreplot_custom():
+def test_loreplot_custom(sample_data):
     fig, ax = plt.subplots()
     loreplot(
-        df,
+        sample_data,
         "x",
         "y",
         add_dots=False,
@@ -80,9 +92,9 @@ def test_loreplot_custom():
 
 
 # Test case for loreplot with add_dots=True
-def test_loreplot_with_dots():
+def test_loreplot_with_dots(sample_data):
     fig, ax = plt.subplots()
-    loreplot(df, "x", "y", add_dots=True, ax=ax)
+    loreplot(sample_data, "x", "y", add_dots=True, ax=ax)
     assert ax.get_title() == ""
     assert ax.get_xlabel() == "x"
     assert ax.get_ylabel() == ""
@@ -91,7 +103,7 @@ def test_loreplot_with_dots():
 # Sample data for testing internal functions
 X_reg = np.array([1.0, 2.0, 3.0, 4.0, 5.0]).reshape(-1, 1)
 y_reg = np.array([0, 1, 0, 1, 1])
-lg = LogisticRegression(multi_class="multinomial")
+lg = LogisticRegression()
 lg.fit(X_reg, y_reg)
 
 

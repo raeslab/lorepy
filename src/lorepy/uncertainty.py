@@ -35,7 +35,7 @@ def _get_uncertainty_data(
                 f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
             )
 
-        lg = LogisticRegression(multi_class="multinomial") if clf is None else clf
+        lg = LogisticRegression() if clf is None else clf
         lg.fit(X_keep, y_keep)
         new_area = _get_area_df(lg, x, x_range, confounders=confounders).reset_index()
 

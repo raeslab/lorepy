@@ -117,12 +117,12 @@ plt.show()
 
 iris_df["sepal_bin"] = pd.cut(iris_df["sepal width (cm)"], 6)
 count_df = (
-    iris_df.groupby(["species", "sepal_bin"], as_index=False)
+    iris_df.groupby(["species", "sepal_bin"], as_index=False, observed=False)
     .size()
-    .pivot_table(index="sepal_bin", columns="species", values="size")
+    .pivot_table(index="sepal_bin", columns="species", values="size", observed=False)
 )
 
-label_df = iris_df.groupby("sepal_bin", as_index=False).size()
+label_df = iris_df.groupby("sepal_bin", as_index=False, observed=False).size()
 label_df["label"] = label_df.apply(
     lambda x: str(x["sepal_bin"]) + " (n=" + str(x["size"]) + ")", axis=1
 )
@@ -144,12 +144,12 @@ plt.show()
 
 iris_df["sepal_cut"] = pd.qcut(iris_df["sepal width (cm)"], 6, duplicates="drop")
 count_df = (
-    iris_df.groupby(["species", "sepal_cut"], as_index=False)
+    iris_df.groupby(["species", "sepal_cut"], as_index=False, observed=False)
     .size()
-    .pivot_table(index="sepal_cut", columns="species", values="size")
+    .pivot_table(index="sepal_cut", columns="species", values="size", observed=False)
 )
 
-label_df = iris_df.groupby("sepal_cut", as_index=False).size()
+label_df = iris_df.groupby("sepal_cut", as_index=False, observed=False).size()
 label_df["label"] = label_df.apply(
     lambda x: str(x["sepal_cut"]) + " (n=" + str(x["size"]) + ")", axis=1
 )

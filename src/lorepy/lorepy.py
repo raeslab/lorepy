@@ -89,7 +89,7 @@ def loreplot(
     if x_range is None:
         x_range = r
 
-    lg = LogisticRegression(multi_class="multinomial") if clf is None else clf
+    lg = LogisticRegression() if clf is None else clf
     lg.fit(X_reg, y_reg)
 
     if "linestyle" not in kwargs.keys():
