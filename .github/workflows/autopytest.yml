@@ -40,7 +40,7 @@ jobs:
       - name: Update Coverage Badge if needed
         if: failure()
         run:
-          git config --local user.email '${GITHUB_ACTOR}@users.noreply.github.com'
-          git config --local user.name "update-coverage-badge[bot]"
-          git commit -am "Auto updating coverage badge"
+          git config --global user.name pytest_cover_badge
+          git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
+          git commit -am "Update cover badge"
           git push
