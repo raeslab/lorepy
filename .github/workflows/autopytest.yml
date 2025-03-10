@@ -39,7 +39,7 @@ jobs:
       - run: git diff --exit-code ./docs/coverage-badge.svg
       - name: Update Coverage Badge if needed
         if: failure()
-        run:
+        run:  |
           git config --local user.email '${GITHUB_ACTOR}@users.noreply.github.com'
           git config --local user.name "test-webservices[bot]"
           git add ./docs/coverage-badge.svg
