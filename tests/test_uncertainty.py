@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 from lorepy import uncertainty_plot
 from matplotlib.colors import ListedColormap
+from matplotlib import pyplot as plt
 from sklearn.svm import SVC
 
 
@@ -63,3 +64,19 @@ def test_get_uncertainty_confounder(sample_data):
 def test_uncertainty_incorrect_mode(sample_data):
     with pytest.raises(NotImplementedError):
         assert uncertainty_plot(sample_data, "x", "y", mode="fail")
+
+def test_uncertainty_with_existing_ax(sample_data):
+    fig, ax = plt.subplots(1, 2)  # Create 2 axes manually
+    returned_fig, returned_axs = uncertainty_plot(sample_data, "x", "y", ax=ax)
+
+    assert returned_fig is not None
+    assert returned_axs[0] == ax[0]
+    assert returned_axs[1] == ax[1]
+    assert len(returned_axs) == 2
+    assert returned_axs[0].get_title() == "0"
+    assert returned_axs[0].get_xlabel() == "x"
+
+def test_uncertainty_incorrect_ax_length(sample_data):
+    fig, ax = plt.subplots(1, 1)  # Only one axis created, but we expect two
+    with pytest.raises(AssertionError):
+        uncertainty_plot(sample_data, "x", "y", ax=[ax])

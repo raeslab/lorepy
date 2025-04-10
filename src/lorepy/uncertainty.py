@@ -73,6 +73,7 @@ def uncertainty_plot(
     confounders=[],
     colormap=None,
     clf=None,
+    ax=None
 ):
     """
     Code to create a multi-panel plot, one panel for each category, with the prevalence of that category across the
@@ -88,6 +89,7 @@ def uncertainty_plot(
     :param confounders: List of tuples with the feature and reference value e.g., [("BMI", 25)] will use a reference of 25 for plots
     :param colormap: Colormap to use for the plot, default is None in which case matplotlib's default will be used
     :param clf: Provide a different scikit-learn classifier for the function. Should implement the predict_proba() and fit(). If None a LogisticRegression will be used.
+    :param ax: Optional. List of matplotlib Axes to plot into. If None, a new figure and axes will be created.
     :return: A tuple containing the figure and axes objects
     """
     X_reg, y_reg, r = _prepare_data(data, x, y, confounders)
@@ -109,7 +111,12 @@ def uncertainty_plot(
 
     categories = plot_df.variable.unique()
 
-    fig, axs = plt.subplots(ncols=len(categories), sharex=True, sharey=True)
+    if ax is None:
+        fig, axs = plt.subplots(ncols=len(categories), sharex=True, sharey=True)
+    else:
+        assert len(ax) == len(categories), "Length of ax must match number of categories"
+        fig = ax[0].figure
+        axs = ax
 
     cmap = plt.get_cmap("tab10") if colormap is None else colormap
 
