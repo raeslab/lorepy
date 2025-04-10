@@ -59,7 +59,7 @@ def _get_uncertainty_data(
         .reset_index()
     )
 
-    return output
+    return output, long_df
 
 
 def uncertainty_plot(
@@ -97,7 +97,7 @@ def uncertainty_plot(
     if x_range is None:
         x_range = r
 
-    plot_df = _get_uncertainty_data(
+    plot_df, _ = _get_uncertainty_data(
         x,
         X_reg,
         y_reg,
