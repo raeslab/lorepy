@@ -73,7 +73,7 @@ def uncertainty_plot(
     confounders=[],
     colormap=None,
     clf=None,
-    ax=None
+    ax=None,
 ):
     """
     Code to create a multi-panel plot, one panel for each category, with the prevalence of that category across the
@@ -114,7 +114,9 @@ def uncertainty_plot(
     if ax is None:
         fig, axs = plt.subplots(ncols=len(categories), sharex=True, sharey=True)
     else:
-        assert len(ax) == len(categories), "Length of ax must match number of categories"
+        assert len(ax) == len(
+            categories
+        ), "Length of ax must match number of categories"
         fig = ax[0].figure
         axs = ax
 

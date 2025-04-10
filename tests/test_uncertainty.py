@@ -65,6 +65,7 @@ def test_uncertainty_incorrect_mode(sample_data):
     with pytest.raises(NotImplementedError):
         assert uncertainty_plot(sample_data, "x", "y", mode="fail")
 
+
 def test_uncertainty_with_existing_ax(sample_data):
     fig, ax = plt.subplots(1, 2)  # Create 2 axes manually
     returned_fig, returned_axs = uncertainty_plot(sample_data, "x", "y", ax=ax)
@@ -75,6 +76,7 @@ def test_uncertainty_with_existing_ax(sample_data):
     assert len(returned_axs) == 2
     assert returned_axs[0].get_title() == "0"
     assert returned_axs[0].get_xlabel() == "x"
+
 
 def test_uncertainty_incorrect_ax_length(sample_data):
     fig, ax = plt.subplots(1, 1)  # Only one axis created, but we expect two
