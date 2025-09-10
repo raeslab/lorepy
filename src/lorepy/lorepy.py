@@ -8,6 +8,20 @@ from sklearn.linear_model import LogisticRegression
 
 
 def _prepare_data(data, x, y, confounders):
+    """
+    Prepares the input data for regression analysis by selecting relevant features and target variable,
+    removing rows with missing values, and extracting the range of the primary feature.
+
+    :param data: pd.DataFrame. The input dataframe containing all features and target variable.
+    :param x: str. The name of the primary feature to be used for regression.
+    :param y: str. The name of the target variable.
+    :param confounders: list. A list of tuples, where each tuple contains the name of a confounder feature as its reference value.
+
+    :return: tuple. A tuple containing:
+        - X_reg (np.ndarray): Array of selected features for regression.
+        - y_reg (np.ndarray): Array of target variable values.
+        - x_range (tuple): Minimum and maximum values of the primary feature.
+    """
     x_features = [x] + [i[0] for i in confounders]
 
     tmp_df = data[x_features + [y]].dropna()
@@ -19,7 +33,24 @@ def _prepare_data(data, x, y, confounders):
     return X_reg, y_reg, x_range
 
 
-def _get_area_df(lg, x_feature, x_range, confounders=[]) -> DataFrame:
+def _get_area_df(lg, x_feature, x_range, confounders=None) -> DataFrame:
+
+    """
+    Generates a DataFrame containing predicted class probabilities over a specified range of a feature,
+    optionally holding confounder variables constant.
+
+    :param lg: A fitted classifier with a `predict_proba` method and `classes_` attribute.
+    :param x_feature: The name of the feature to vary.
+    :type x_feature: str
+    :param x_range: A tuple (min, max) specifying the range of values for `x_feature`.
+    :type x_range: tuple
+    :param confounders: Optional list of tuples (feature, reference value) pairs representing confounder features and their reference values.
+    :type confounders: list, optional
+    :returns: DataFrame indexed by `x_feature`, containing predicted probabilities for each class.
+    :rtype: pandas.DataFrame
+    """
+    confounders = [] if confounders is None else confounders
+
     values = np.linspace(x_range[0], x_range[1], num=200)
 
     predict_df = pd.DataFrame({"values": values})
@@ -35,7 +66,22 @@ def _get_area_df(lg, x_feature, x_range, confounders=[]) -> DataFrame:
     return proba_df
 
 
-def _get_dots_df(X, y, lg, y_feature, confounders=[], jitter=0) -> DataFrame:
+def _get_dots_df(X, y, lg, y_feature, confounders=None, jitter=0) -> DataFrame:
+    """
+    Generates a DataFrame containing x and y coordinates for visualizing classification probabilities.
+    Each data point's x coordinate is optionally jittered, and its y coordinate is sampled within the
+    probability interval assigned to its true class by the provided classifier. Optionally, confounders
+    can be included in the prediction.
+
+    :param X: Feature vectors for each sample.
+    :param y: True class labels for each sample.
+    :param lg: Classifier with `predict_proba` and `classes_` attributes.
+    :param y_feature: Name of the column representing the class label in the output DataFrame.
+    :param confounders: A list of tuples, where each tuple contains the name of a confounder feature as its reference value. Defaults to None.
+    :param jitter: Amount of random jitter to add to the x coordinate. Defaults to 0.
+    :return: pandas.DataFrame with columns `[y_feature, "x", "y"]` representing class label, x coordinate, and y coordinate.
+    """
+    confounders = [] if confounders is None else confounders
     output = []
 
     for x, s in zip(X, y):
@@ -44,9 +90,12 @@ def _get_dots_df(X, y, lg, y_feature, confounders=[], jitter=0) -> DataFrame:
 
         proba = lg.predict_proba([x] + [i[1] for i in confounders])
         i = list(lg.classes_).index(s)
+
+        # Compute a margin to avoid placing points exactly on the boundaries
         min_value = sum(proba[0][:i])
         max_value = sum(proba[0][: i + 1])
         margin = (max_value - min_value) / 10
+
         ypos = np.random.uniform(low=min_value + margin, high=max_value - margin)
         output.append({y_feature: s, "x": x[0], "y": ypos})
 
@@ -62,7 +111,7 @@ def loreplot(
     scatter_kws: dict = dict({}),
     ax=None,
     clf=None,
-    confounders=[],
+    confounders=None,
     jitter=0,
     **kwargs,
 ):
@@ -83,6 +132,8 @@ def loreplot(
     """
     if ax is None:
         ax = plt.gca()
+
+    confounders = [] if confounders is None else confounders
 
     X_reg, y_reg, r = _prepare_data(data, x, y, confounders)
 
