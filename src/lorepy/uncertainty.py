@@ -76,6 +76,96 @@ def _get_uncertainty_data(
     return output, long_df
 
 
+def _get_feature_importance(
+    x: str,
+    X_reg,
+    y_reg,
+    mode="resample",
+    jackknife_fraction: float = 0.8,
+    iterations: int = 100,
+    confounders=None,
+    clf=None,
+):
+    """
+    Estimates the importance of the x-feature in predicting class labels using permutation-based
+    feature importance with resampling or jackknife methods. Uses accuracy as the performance metric.
+
+    :param x: Name of the feature variable to analyze for importance.
+    :param X_reg: Feature matrix for regression/classification.
+    :param y_reg: Target variable.
+    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
+    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
+    :param iterations: Number of resampling or jackknife iterations.
+    :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
+    :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
+    """
+    confounders = [] if confounders is None else confounders
+
+    importance_scores = []
+    
+    for i in range(iterations):
+        if mode == "jackknife":
+            X_keep, _, y_keep, _ = train_test_split(
+                X_reg, y_reg, train_size=jackknife_fraction
+            )
+        elif mode == "resample":
+            X_keep, y_keep = resample(X_reg, y_reg, replace=True)
+        else:
+            raise NotImplementedError(
+                f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
+            )
+
+        # Fit model with original data
+        lg_normal = LogisticRegression() if clf is None else clf
+        lg_normal.fit(X_keep, y_keep)
+        normal_accuracy = lg_normal.score(X_keep, y_keep)
+        
+        # Create shuffled version by permuting only the x-feature (first column)
+        # Keep confounders intact since they represent controlled variables
+        X_shuffled = X_keep.copy()
+        X_shuffled[:, 0] = np.random.permutation(X_shuffled[:, 0])
+        
+        # Fit model with shuffled x-feature
+        lg_shuffled = LogisticRegression() if clf is None else clf
+        lg_shuffled.fit(X_shuffled, y_keep)
+        shuffled_accuracy = lg_shuffled.score(X_shuffled, y_keep)
+        
+        # Feature importance = performance drop when x-feature is shuffled
+        importance = normal_accuracy - shuffled_accuracy
+        importance_scores.append(importance)
+    
+    importance_scores = np.array(importance_scores)
+    
+    # Calculate statistics
+    mean_importance = np.mean(importance_scores)
+    std_importance = np.std(importance_scores)
+    ci_95_low = np.percentile(importance_scores, 2.5)
+    ci_95_high = np.percentile(importance_scores, 97.5)
+    
+    # Significance metrics
+    significant_positive = np.sum(importance_scores > 0) / iterations
+    significant_negative = np.sum(importance_scores < 0) / iterations
+    
+    # Empirical p-value (two-tailed test)
+    p_value = 2 * min(significant_positive, significant_negative) if significant_positive != significant_negative else 1.0
+    
+    return {
+        'feature': x,
+        'mean_importance': mean_importance,
+        'std_importance': std_importance,
+        'importance_95ci_low': ci_95_low,
+        'importance_95ci_high': ci_95_high,
+        'proportion_positive': significant_positive,
+        'proportion_negative': significant_negative,
+        'p_value': p_value,
+        'iterations': iterations,
+        'mode': mode,
+        'interpretation': f"Feature importance: {mean_importance:.4f} ± {std_importance:.4f}. "
+                         f"Positive in {significant_positive:.1%} of iterations (p={p_value:.4f})"
+    }
+
+
 def uncertainty_plot(
     data: DataFrame,
     x: str,
