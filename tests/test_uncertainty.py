@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from lorepy import uncertainty_plot
+from lorepy import uncertainty_plot, feature_importance
 from lorepy.uncertainty import _get_feature_importance
 from lorepy.lorepy import _prepare_data
 from matplotlib.colors import ListedColormap
@@ -155,3 +155,40 @@ def test_feature_importance_incorrect_mode(sample_data):
 
     with pytest.raises(NotImplementedError):
         _get_feature_importance("x", X_reg, y_reg, mode="invalid_mode")
+
+
+# Test case for public feature_importance function
+def test_public_feature_importance(sample_data):
+    # Test the public API function
+    result = feature_importance(sample_data, x="x", y="y", iterations=10)
+    
+    # Should have same output format as internal function
+    expected_keys = ['feature', 'mean_importance', 'std_importance', 
+                    'importance_95ci_low', 'importance_95ci_high',
+                    'proportion_positive', 'proportion_negative', 
+                    'p_value', 'iterations', 'mode', 'interpretation']
+    
+    for key in expected_keys:
+        assert key in result
+    
+    assert result['feature'] == "x"
+    assert result['iterations'] == 10
+
+
+# Test public function with confounders and different classifier
+def test_public_feature_importance_advanced(sample_data):
+    svc = SVC(probability=True)
+    
+    result = feature_importance(
+        sample_data, 
+        x="x", 
+        y="y", 
+        confounders=[("z", 5)],
+        clf=svc,
+        mode="jackknife",
+        iterations=10
+    )
+    
+    assert result['feature'] == "x"
+    assert result['mode'] == "jackknife"
+    assert isinstance(result['mean_importance'], float)

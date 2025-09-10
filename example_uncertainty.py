@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from lorepy import uncertainty_plot
+from lorepy import uncertainty_plot, feature_importance
 from matplotlib.colors import ListedColormap
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC
@@ -15,6 +15,10 @@ iris_df["species"] = [iris_obj.target_names[s] for s in iris_obj.target]
 uncertainty_plot(data=iris_df, x="sepal width (cm)", y="species", iterations=100)
 plt.savefig("./docs/img/uncertainty_default.png", dpi=150)
 plt.show()
+
+# Statistics for this plot
+stats = feature_importance(data=iris_df, x="sepal width (cm)", y="species", iterations=100)
+print(stats)
 
 # Using jackknife instead of resample to assess uncertainty
 uncertainty_plot(
@@ -53,6 +57,18 @@ uncertainty_plot(
 )
 plt.savefig("./docs/img/uncertainty_confounder.png", dpi=150)
 plt.show()
+
+# Stats with confounder
+stats = feature_importance(
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+    iterations=100,
+    mode="resample",
+    confounders=[("petal width (cm)", 1)]
+)
+
+print(stats)
 
 # Uncertainty plot with a custom classifier
 svc = SVC(probability=True)

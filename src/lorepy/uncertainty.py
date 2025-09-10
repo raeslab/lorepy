@@ -249,3 +249,62 @@ def uncertainty_plot(
         axs[idx].set_ylim(0, 1)
 
     return fig, axs
+
+
+def feature_importance(
+    data: DataFrame,
+    x: str,
+    y: str,
+    mode="resample",
+    jackknife_fraction=0.8,
+    iterations=100,
+    confounders=None,
+    clf=None,
+):
+    """
+    Estimates the importance of a feature in predicting class labels using permutation-based
+    feature importance with resampling or jackknife methods. Uses accuracy as the performance metric.
+
+    This function provides statistical assessment of whether the x-feature is significantly
+    associated with the class distribution (y-variable). Higher importance scores indicate
+    stronger predictive relationships.
+
+    :param data: The input dataframe containing all features and target variable.
+    :param x: The name of the feature to analyze for importance.
+    :param y: The name of the target variable.
+    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
+    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
+    :param iterations: Number of resampling or jackknife iterations.
+    :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
+    :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
+
+    Example:
+        >>> import pandas as pd
+        >>> from lorepy import feature_importance
+        >>> from sklearn.datasets import load_iris
+        >>> 
+        >>> iris = load_iris()
+        >>> df = pd.DataFrame(iris.data, columns=iris.feature_names)
+        >>> df['species'] = iris.target
+        >>> 
+        >>> stats = feature_importance(df, x='sepal length (cm)', y='species')
+        >>> print(stats['interpretation'])
+        'Feature importance: 0.234 ± 0.045. Positive in 98.0% of iterations (p=0.020)'
+    """
+    confounders = [] if confounders is None else confounders
+    
+    # Prepare data using existing helper function
+    X_reg, y_reg, _ = _prepare_data(data, x, y, confounders)
+    
+    # Call internal function to do the heavy lifting
+    return _get_feature_importance(
+        x=x,
+        X_reg=X_reg,
+        y_reg=y_reg,
+        mode=mode,
+        jackknife_fraction=jackknife_fraction,
+        iterations=iterations,
+        confounders=confounders,
+        clf=clf,
+    )
