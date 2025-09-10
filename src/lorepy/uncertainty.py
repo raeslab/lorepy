@@ -5,6 +5,7 @@ from pandas import DataFrame
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.utils import resample
+from sklearn.inspection import permutation_importance
 
 from lorepy.lorepy import _get_area_df, _prepare_data
 
@@ -113,23 +114,22 @@ def _get_feature_importance(
                 f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
             )
 
-        # Fit model with original data
-        lg_normal = LogisticRegression() if clf is None else clf
-        lg_normal.fit(X_keep, y_keep)
-        normal_accuracy = lg_normal.score(X_keep, y_keep)
-
-        # Create shuffled version by permuting only the x-feature (first column)
-        # Keep confounders intact since they represent controlled variables
-        X_shuffled = X_keep.copy()
-        X_shuffled[:, 0] = np.random.permutation(X_shuffled[:, 0])
-
-        # Fit model with shuffled x-feature
-        lg_shuffled = LogisticRegression() if clf is None else clf
-        lg_shuffled.fit(X_shuffled, y_keep)
-        shuffled_accuracy = lg_shuffled.score(X_shuffled, y_keep)
-
-        # Feature importance = performance drop when x-feature is shuffled
-        importance = normal_accuracy - shuffled_accuracy
+        # Fit model and use sklearn's permutation_importance
+        lg = LogisticRegression() if clf is None else clf
+        lg.fit(X_keep, y_keep)
+        
+        # Use permutation_importance to get feature importance for first feature (x)
+        # This handles proper train/test splits internally and avoids training data leakage
+        perm_result = permutation_importance(
+            lg, X_keep, y_keep, 
+            n_repeats=1,  # We handle iterations in outer loop
+            random_state=None,  # Allow randomness for each iteration
+            scoring='accuracy',
+            n_jobs=1
+        )
+        
+        # Extract importance for first feature (x-feature)
+        importance = perm_result.importances_mean[0]
         importance_scores.append(importance)
 
     importance_scores = np.array(importance_scores)
