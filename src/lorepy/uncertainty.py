@@ -117,17 +117,19 @@ def _get_feature_importance(
         # Fit model and use sklearn's permutation_importance
         lg = LogisticRegression() if clf is None else clf
         lg.fit(X_keep, y_keep)
-        
+
         # Use permutation_importance to get feature importance for first feature (x)
         # This handles proper train/test splits internally and avoids training data leakage
         perm_result = permutation_importance(
-            lg, X_keep, y_keep, 
+            lg,
+            X_keep,
+            y_keep,
             n_repeats=1,  # We handle iterations in outer loop
             random_state=None,  # Allow randomness for each iteration
-            scoring='accuracy',
-            n_jobs=1
+            scoring="accuracy",
+            n_jobs=1,
         )
-        
+
         # Extract importance for first feature (x-feature)
         importance = perm_result.importances_mean[0]
         importance_scores.append(importance)
