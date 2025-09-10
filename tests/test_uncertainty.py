@@ -161,34 +161,43 @@ def test_feature_importance_incorrect_mode(sample_data):
 def test_public_feature_importance(sample_data):
     # Test the public API function
     result = feature_importance(sample_data, x="x", y="y", iterations=10)
-    
+
     # Should have same output format as internal function
-    expected_keys = ['feature', 'mean_importance', 'std_importance', 
-                    'importance_95ci_low', 'importance_95ci_high',
-                    'proportion_positive', 'proportion_negative', 
-                    'p_value', 'iterations', 'mode', 'interpretation']
-    
+    expected_keys = [
+        "feature",
+        "mean_importance",
+        "std_importance",
+        "importance_95ci_low",
+        "importance_95ci_high",
+        "proportion_positive",
+        "proportion_negative",
+        "p_value",
+        "iterations",
+        "mode",
+        "interpretation",
+    ]
+
     for key in expected_keys:
         assert key in result
-    
-    assert result['feature'] == "x"
-    assert result['iterations'] == 10
+
+    assert result["feature"] == "x"
+    assert result["iterations"] == 10
 
 
 # Test public function with confounders and different classifier
 def test_public_feature_importance_advanced(sample_data):
     svc = SVC(probability=True)
-    
+
     result = feature_importance(
-        sample_data, 
-        x="x", 
-        y="y", 
+        sample_data,
+        x="x",
+        y="y",
         confounders=[("z", 5)],
         clf=svc,
         mode="jackknife",
-        iterations=10
+        iterations=10,
     )
-    
-    assert result['feature'] == "x"
-    assert result['mode'] == "jackknife"
-    assert isinstance(result['mean_importance'], float)
+
+    assert result["feature"] == "x"
+    assert result["mode"] == "jackknife"
+    assert isinstance(result["mean_importance"], float)

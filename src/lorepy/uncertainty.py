@@ -283,20 +283,20 @@ def feature_importance(
         >>> import pandas as pd
         >>> from lorepy import feature_importance
         >>> from sklearn.datasets import load_iris
-        >>> 
+        >>>
         >>> iris = load_iris()
         >>> df = pd.DataFrame(iris.data, columns=iris.feature_names)
         >>> df['species'] = iris.target
-        >>> 
+        >>>
         >>> stats = feature_importance(df, x='sepal length (cm)', y='species')
         >>> print(stats['interpretation'])
         'Feature importance: 0.234 ± 0.045. Positive in 98.0% of iterations (p=0.020)'
     """
     confounders = [] if confounders is None else confounders
-    
+
     # Prepare data using existing helper function
     X_reg, y_reg, _ = _prepare_data(data, x, y, confounders)
-    
+
     # Call internal function to do the heavy lifting
     return _get_feature_importance(
         x=x,

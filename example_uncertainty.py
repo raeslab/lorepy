@@ -17,7 +17,9 @@ plt.savefig("./docs/img/uncertainty_default.png", dpi=150)
 plt.show()
 
 # Statistics for this plot
-stats = feature_importance(data=iris_df, x="sepal width (cm)", y="species", iterations=100)
+stats = feature_importance(
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100
+)
 print(stats)
 
 # Using jackknife instead of resample to assess uncertainty
@@ -65,7 +67,7 @@ stats = feature_importance(
     y="species",
     iterations=100,
     mode="resample",
-    confounders=[("petal width (cm)", 1)]
+    confounders=[("petal width (cm)", 1)],
 )
 
 print(stats)
