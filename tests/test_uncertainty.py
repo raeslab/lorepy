@@ -90,64 +90,68 @@ def test_uncertainty_incorrect_ax_length(sample_data):
 def test_feature_importance_default(sample_data):
     X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])
     result = _get_feature_importance("x", X_reg, y_reg, iterations=10)
-    
+
     # Check that result is a dictionary with expected keys
-    expected_keys = ['feature', 'mean_importance', 'std_importance', 
-                    'importance_95ci_low', 'importance_95ci_high',
-                    'proportion_positive', 'proportion_negative', 
-                    'p_value', 'iterations', 'mode', 'interpretation']
-    
+    expected_keys = [
+        "feature",
+        "mean_importance",
+        "std_importance",
+        "importance_95ci_low",
+        "importance_95ci_high",
+        "proportion_positive",
+        "proportion_negative",
+        "p_value",
+        "iterations",
+        "mode",
+        "interpretation",
+    ]
+
     for key in expected_keys:
         assert key in result
-    
+
     # Check basic properties
-    assert result['feature'] == "x"
-    assert result['iterations'] == 10
-    assert result['mode'] == "resample"
-    assert isinstance(result['mean_importance'], float)
-    assert isinstance(result['p_value'], float)
-    assert 0 <= result['p_value'] <= 1
-    assert 0 <= result['proportion_positive'] <= 1
-    assert 0 <= result['proportion_negative'] <= 1
+    assert result["feature"] == "x"
+    assert result["iterations"] == 10
+    assert result["mode"] == "resample"
+    assert isinstance(result["mean_importance"], float)
+    assert isinstance(result["p_value"], float)
+    assert 0 <= result["p_value"] <= 1
+    assert 0 <= result["proportion_positive"] <= 1
+    assert 0 <= result["proportion_negative"] <= 1
     # Proportions should sum to <= 1 (the remainder are zeros)
-    assert result['proportion_positive'] + result['proportion_negative'] <= 1
+    assert result["proportion_positive"] + result["proportion_negative"] <= 1
 
 
 # Test case for feature importance with different modes and classifiers
 def test_feature_importance_alternative(sample_data):
     X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])
     svc = SVC(probability=True)
-    
+
     result = _get_feature_importance(
-        "x", X_reg, y_reg, 
-        mode="jackknife",
-        iterations=10,
-        clf=svc
+        "x", X_reg, y_reg, mode="jackknife", iterations=10, clf=svc
     )
-    
-    assert result['mode'] == "jackknife"
-    assert result['iterations'] == 10
-    assert isinstance(result['mean_importance'], float)
+
+    assert result["mode"] == "jackknife"
+    assert result["iterations"] == 10
+    assert isinstance(result["mean_importance"], float)
 
 
 # Test case for feature importance with confounders
 def test_feature_importance_confounder(sample_data):
     X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [("z", 5)])
-    
+
     result = _get_feature_importance(
-        "x", X_reg, y_reg, 
-        confounders=[("z", 5)],
-        iterations=10
+        "x", X_reg, y_reg, confounders=[("z", 5)], iterations=10
     )
-    
+
     # Should work without errors when confounders are present
-    assert result['feature'] == "x"
-    assert isinstance(result['mean_importance'], float)
+    assert result["feature"] == "x"
+    assert isinstance(result["mean_importance"], float)
 
 
 # Test error handling for unsupported mode
 def test_feature_importance_incorrect_mode(sample_data):
     X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])
-    
+
     with pytest.raises(NotImplementedError):
         _get_feature_importance("x", X_reg, y_reg, mode="invalid_mode")
