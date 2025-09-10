@@ -10,7 +10,6 @@ from lorepy.lorepy import _get_area_df, _prepare_data
 
 
 def _get_uncertainty_data(
-
     x: str,
     X_reg,
     y_reg,
@@ -25,18 +24,15 @@ def _get_uncertainty_data(
     Estimates uncertainty in model predictions using resampling or jackknife methods.
 
     :param x: Name of the feature variable to analyze.
-    :param X_reg: Feature matrix for regression/classification (array-like or DataFrame).
-    :param y_reg: Target variable (array-like).
-    :param x_range: Range of values for the feature variable `x` to evaluate (array-like).
-    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife". Default is "resample".
-    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife"). Default is 0.8.
-    :param iterations: Number of resampling or jackknife iterations. Default is 100.
-    :param confounders: List of confounder variable names to control for. Default is None.
+    :param X_reg: Feature matrix for regression/classification.
+    :param y_reg: Target variable.
+    :param x_range: Tuple (min, max) specifying the range of values for the feature variable `x` to evaluate.
+    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
+    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
+    :param iterations: Number of resampling or jackknife iterations.
+    :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: output (pandas.DataFrame) containing aggregated uncertainty statistics (min, mean, max, 95% and 50% intervals)
-             for each value of `x` and each predicted variable.
-             long_df (pandas.DataFrame) containing all resampled predictions for further analysis or visualization.
-    :raises NotImplementedError: If an unsupported mode is specified.
+    :return: Tuple containing output DataFrame with aggregated uncertainty statistics and long_df DataFrame with all resampled predictions.
     """
     confounders = [] if confounders is None else confounders
 
