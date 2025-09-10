@@ -136,19 +136,6 @@ def test_feature_importance_alternative(sample_data):
     assert isinstance(result["mean_importance"], float)
 
 
-# Test case for feature importance with confounders
-def test_feature_importance_confounder(sample_data):
-    X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [("z", 5)])
-
-    result = _get_feature_importance(
-        "x", X_reg, y_reg, confounders=[("z", 5)], iterations=10
-    )
-
-    # Should work without errors when confounders are present
-    assert result["feature"] == "x"
-    assert isinstance(result["mean_importance"], float)
-
-
 # Test error handling for unsupported mode
 def test_feature_importance_incorrect_mode(sample_data):
     X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])

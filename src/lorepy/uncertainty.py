@@ -83,7 +83,6 @@ def _get_feature_importance(
     mode="resample",
     jackknife_fraction: float = 0.8,
     iterations: int = 100,
-    confounders=None,
     clf=None,
 ):
     """
@@ -96,11 +95,9 @@ def _get_feature_importance(
     :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
     :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
     :param iterations: Number of resampling or jackknife iterations.
-    :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
     :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
     """
-    confounders = [] if confounders is None else confounders
 
     importance_scores = []
 
@@ -305,6 +302,5 @@ def feature_importance(
         mode=mode,
         jackknife_fraction=jackknife_fraction,
         iterations=iterations,
-        confounders=confounders,
         clf=clf,
     )
