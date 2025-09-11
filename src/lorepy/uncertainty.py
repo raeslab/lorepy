@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import warnings
 from matplotlib import pyplot as plt
 from pandas import DataFrame
 from sklearn.linear_model import LogisticRegression
@@ -101,14 +102,36 @@ def _get_feature_importance(
     """
 
     importance_scores = []
+    
+    # Issue warnings about statistical considerations for different modes
+    if mode == "resample":
+        warnings.warn(
+            "Bootstrap resampling mode uses the same data for training and validation, "
+            "which may lead to overoptimistic importance scores with some models. "
+            "Consider using mode='jackknife' for more conservative estimates with proper train/test splits.",
+            UserWarning,
+            stacklevel=3
+        )
 
     for i in range(iterations):
         if mode == "jackknife":
-            X_keep, _, y_keep, _ = train_test_split(
+            X_keep, X_val, y_keep, y_val = train_test_split(
                 X_reg, y_reg, train_size=jackknife_fraction
             )
+            
+            # Check for small validation sets that may affect statistical reliability
+            if len(y_val) < 20:
+                warnings.warn(
+                    f"Jackknife validation set is small (n={len(y_val)}). "
+                    f"Small validation sets may lead to unreliable importance estimates. "
+                    f"Consider increasing jackknife_fraction (currently {jackknife_fraction}) "
+                    f"or using a larger dataset for more stable results.",
+                    UserWarning,
+                    stacklevel=3
+                )
         elif mode == "resample":
             X_keep, y_keep = resample(X_reg, y_reg, replace=True)
+            X_val, y_val = X_reg, y_reg  # Use full data for validation
         else:
             raise NotImplementedError(
                 f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
@@ -121,9 +144,9 @@ def _get_feature_importance(
         # Use permutation_importance to get feature importance for first feature (x)
         # This handles proper train/test splits internally and avoids training data leakage
         perm_result = permutation_importance(
-            lg,
-            X_keep,
-            y_keep,
+            lg, 
+            X_val, 
+            y_val, 
             n_repeats=1,  # We handle iterations in outer loop
             random_state=None,  # Allow randomness for each iteration
             scoring="accuracy",

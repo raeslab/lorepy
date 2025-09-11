@@ -18,6 +18,8 @@ def _prepare_data(data, x, y, confounders):
     :param confounders: A list of tuples, where each tuple contains the name of a confounder feature and its reference value.
     :return: A tuple containing X_reg (feature array), y_reg (target array), and x_range (min/max of primary feature).
     """
+
+    # Here the x-feature should be the first (!) for compatibility with uncertainty._get_feature_importance!
     x_features = [x] + [i[0] for i in confounders]
 
     tmp_df = data[x_features + [y]].dropna()

@@ -206,15 +206,15 @@ Lorepy provides statistical assessment of how strongly your x-feature is associa
 
 #### How it Works
 
-The function uses a robust resampling approach:
+The function uses a robust resampling approach combined with sklearn's optimized permutation importance:
 
 1. **Bootstrap/Jackknife Sampling**: Creates multiple subsamples of your data (default: 100 iterations)
-2. **Baseline Performance**: For each subsample, fits a classifier and measures accuracy
-3. **Shuffled Performance**: Randomly shuffles the x-feature values and remeasures accuracy
-4. **Feature Importance**: Calculates the performance drop (baseline - shuffled accuracy)
+2. **Permutation Importance**: For each subsample, uses sklearn's `permutation_importance` with proper cross-validation to avoid data leakage
+3. **Feature Shuffling**: Randomly permutes the x-feature values while keeping confounders intact
+4. **Performance Assessment**: Measures accuracy drop using statistically sound train/test splits
 5. **Statistical Summary**: Aggregates results across all iterations to provide confidence intervals and significance testing
 
-This approach works with **any sklearn classifier** (LogisticRegression, SVM, RandomForest, etc.) and properly handles confounders by keeping them constant during shuffling.
+This approach works with **any sklearn classifier** (LogisticRegression, SVM, RandomForest, etc.) and properly handles confounders by keeping them constant during shuffling. The implementation uses sklearn's battle-tested permutation importance algorithm for reliable, unbiased results.
 
 ```python
 from lorepy import feature_importance

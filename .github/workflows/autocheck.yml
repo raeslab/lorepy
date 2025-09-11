@@ -16,9 +16,17 @@ jobs:
           python-version: "3.10"
           architecture: 'x64'
       - run: pip install black
-      - run: black --check ./
-      - name: If needed, commit black changes to a new pull request
-        if: failure()
+      - name: Check if black formatting is needed
+        id: black_check
+        run: |
+          if black --check ./; then
+            echo "needs_formatting=false" >> $GITHUB_OUTPUT
+          else
+            echo "needs_formatting=true" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+      - name: Apply black formatting and commit if needed
+        if: steps.black_check.outputs.needs_formatting == 'true'
         run: |
           black ./
           git config --global user.name autoblack_push

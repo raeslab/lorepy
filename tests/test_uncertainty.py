@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+import warnings
 from lorepy import uncertainty_plot, feature_importance
 from lorepy.uncertainty import _get_feature_importance
 from lorepy.lorepy import _prepare_data
@@ -188,3 +189,46 @@ def test_public_feature_importance_advanced(sample_data):
     assert result["feature"] == "x"
     assert result["mode"] == "jackknife"
     assert isinstance(result["mean_importance"], float)
+
+
+# Test warning for bootstrap mode (train/validation overlap)
+def test_feature_importance_bootstrap_warning(sample_data):
+    with pytest.warns(UserWarning, match="Bootstrap resampling mode uses the same data"):
+        result = feature_importance(sample_data, x="x", y="y", mode="resample", iterations=5)
+        assert result["mode"] == "resample"
+
+
+# Test warning for small validation sets in jackknife mode
+def test_feature_importance_small_validation_warning():
+    # Create a small dataset to trigger the warning
+    small_data = pd.DataFrame({
+        'x': np.random.randn(15),
+        'y': np.random.choice([0, 1], 15),
+        'z': np.random.randn(15)
+    })
+    
+    with pytest.warns(UserWarning, match="Jackknife validation set is small"):
+        # With jackknife_fraction=0.8, validation set will be 15 * 0.2 = 3 < 20
+        result = feature_importance(small_data, x="x", y="y", mode="jackknife", 
+                                  jackknife_fraction=0.8, iterations=5)
+        assert result["mode"] == "jackknife"
+
+
+# Test no warning for adequate validation sets
+def test_feature_importance_no_warning_adequate_validation():
+    # Create a larger dataset that shouldn't trigger warnings
+    large_data = pd.DataFrame({
+        'x': np.random.randn(150),
+        'y': np.random.choice([0, 1], 150),
+        'z': np.random.randn(150)
+    })
+    
+    # This should not trigger any warnings (150 * 0.2 = 30 validation samples >= 20)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # Turn warnings into errors
+        try:
+            result = feature_importance(large_data, x="x", y="y", mode="jackknife", 
+                                      jackknife_fraction=0.8, iterations=5)
+            assert result["mode"] == "jackknife"
+        except UserWarning:
+            pytest.fail("Unexpected warning for adequate validation set size")

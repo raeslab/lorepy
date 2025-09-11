@@ -22,6 +22,12 @@ stats = feature_importance(
 )
 print(stats)
 
+stats = feature_importance(
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="jackknife"
+)
+print(stats)
+
+
 # Using jackknife instead of resample to assess uncertainty
 uncertainty_plot(
     data=iris_df,
