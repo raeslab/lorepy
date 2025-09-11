@@ -102,7 +102,7 @@ def _get_feature_importance(
     """
 
     importance_scores = []
-    
+
     # Issue warnings about statistical considerations for different modes
     if mode == "resample":
         warnings.warn(
@@ -110,7 +110,7 @@ def _get_feature_importance(
             "which may lead to overoptimistic importance scores with some models. "
             "Consider using mode='jackknife' for more conservative estimates with proper train/test splits.",
             UserWarning,
-            stacklevel=3
+            stacklevel=3,
         )
 
     for i in range(iterations):
@@ -118,7 +118,7 @@ def _get_feature_importance(
             X_keep, X_val, y_keep, y_val = train_test_split(
                 X_reg, y_reg, train_size=jackknife_fraction
             )
-            
+
             # Check for small validation sets that may affect statistical reliability
             if len(y_val) < 20:
                 warnings.warn(
@@ -127,7 +127,7 @@ def _get_feature_importance(
                     f"Consider increasing jackknife_fraction (currently {jackknife_fraction}) "
                     f"or using a larger dataset for more stable results.",
                     UserWarning,
-                    stacklevel=3
+                    stacklevel=3,
                 )
         elif mode == "resample":
             X_keep, y_keep = resample(X_reg, y_reg, replace=True)
@@ -144,9 +144,9 @@ def _get_feature_importance(
         # Use permutation_importance to get feature importance for first feature (x)
         # This handles proper train/test splits internally and avoids training data leakage
         perm_result = permutation_importance(
-            lg, 
-            X_val, 
-            y_val, 
+            lg,
+            X_val,
+            y_val,
             n_repeats=1,  # We handle iterations in outer loop
             random_state=None,  # Allow randomness for each iteration
             scoring="accuracy",
