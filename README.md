@@ -25,6 +25,7 @@ Lorepy can be installed using pip using the command below.
 pip install lorepy
 ```
 
+**This might take a few minutes as several dependencies need to be installed in the environment as well (e.g. pandas and scikit-learn)**
 
 ## Usage
 
@@ -55,6 +56,8 @@ While lorepy has very few customizations, it is possible to pass arguments throu
 [DataFrame.plot.area](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.area.html)
 and Matplotlib's [pyplot.scatter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html) to change
 the aesthetics of the plots.
+
+**All examples below should run within a few seconds, though on large datasets the uncertainty plot can take a few minutes depending on the size of the dataset and settings selected.**
 
 ### Disable sample dots
 
@@ -221,3 +224,4 @@ lorepy was developed by [Sebastian Proost](https://sebastian.proost.science/) at
 license. 
 
 For commercial access inquiries, please contact [Jeroen Raes](mailto:jeroen.raes@kuleuven.vib.be).
+
