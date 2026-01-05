@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
 import pytest
-from lorepy import uncertainty_plot
+import warnings
+from lorepy import uncertainty_plot, feature_importance
+from lorepy.uncertainty import _get_feature_importance
+from lorepy.lorepy import _prepare_data
 from matplotlib.colors import ListedColormap
 from matplotlib import pyplot as plt
 from sklearn.svm import SVC
@@ -82,3 +85,170 @@ def test_uncertainty_incorrect_ax_length(sample_data):
     fig, ax = plt.subplots(1, 1)  # Only one axis created, but we expect two
     with pytest.raises(AssertionError):
         uncertainty_plot(sample_data, "x", "y", ax=[ax])
+
+
+# Test case for feature importance function with default parameters
+def test_feature_importance_default(sample_data):
+    X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])
+    result = _get_feature_importance("x", X_reg, y_reg, iterations=10)
+
+    # Check that result is a dictionary with expected keys
+    expected_keys = [
+        "feature",
+        "mean_importance",
+        "std_importance",
+        "importance_95ci_low",
+        "importance_95ci_high",
+        "proportion_positive",
+        "proportion_negative",
+        "p_value",
+        "iterations",
+        "mode",
+        "interpretation",
+    ]
+
+    for key in expected_keys:
+        assert key in result
+
+    # Check basic properties
+    assert result["feature"] == "x"
+    assert result["iterations"] == 10
+    assert result["mode"] == "resample"
+    assert isinstance(result["mean_importance"], float)
+    assert isinstance(result["p_value"], float)
+    assert 0 <= result["p_value"] <= 1
+    assert 0 <= result["proportion_positive"] <= 1
+    assert 0 <= result["proportion_negative"] <= 1
+    # Proportions should sum to <= 1 (the remainder are zeros)
+    assert result["proportion_positive"] + result["proportion_negative"] <= 1
+
+
+# Test case for feature importance with different modes and classifiers
+def test_feature_importance_alternative(sample_data):
+    X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])
+    svc = SVC(probability=True)
+
+    result = _get_feature_importance(
+        "x", X_reg, y_reg, mode="jackknife", iterations=10, clf=svc
+    )
+
+    assert result["mode"] == "jackknife"
+    assert result["iterations"] == 10
+    assert isinstance(result["mean_importance"], float)
+
+
+# Test error handling for unsupported mode
+def test_feature_importance_incorrect_mode(sample_data):
+    X_reg, y_reg, _ = _prepare_data(sample_data, "x", "y", [])
+
+    with pytest.raises(NotImplementedError):
+        _get_feature_importance("x", X_reg, y_reg, mode="invalid_mode")
+
+
+# Test case for public feature_importance function
+def test_public_feature_importance(sample_data):
+    # Test the public API function
+    result = feature_importance(sample_data, x="x", y="y", iterations=10)
+
+    # Should have same output format as internal function
+    expected_keys = [
+        "feature",
+        "mean_importance",
+        "std_importance",
+        "importance_95ci_low",
+        "importance_95ci_high",
+        "proportion_positive",
+        "proportion_negative",
+        "p_value",
+        "iterations",
+        "mode",
+        "interpretation",
+    ]
+
+    for key in expected_keys:
+        assert key in result
+
+    assert result["feature"] == "x"
+    assert result["iterations"] == 10
+
+
+# Test public function with confounders and different classifier
+def test_public_feature_importance_advanced(sample_data):
+    svc = SVC(probability=True)
+
+    result = feature_importance(
+        sample_data,
+        x="x",
+        y="y",
+        confounders=[("z", 5)],
+        clf=svc,
+        mode="jackknife",
+        iterations=10,
+    )
+
+    assert result["feature"] == "x"
+    assert result["mode"] == "jackknife"
+    assert isinstance(result["mean_importance"], float)
+
+
+# Test warning for bootstrap mode (train/validation overlap)
+def test_feature_importance_bootstrap_warning(sample_data):
+    with pytest.warns(
+        UserWarning, match="Bootstrap resampling mode uses the same data"
+    ):
+        result = feature_importance(
+            sample_data, x="x", y="y", mode="resample", iterations=5
+        )
+        assert result["mode"] == "resample"
+
+
+# Test warning for small validation sets in jackknife mode
+def test_feature_importance_small_validation_warning():
+    # Create a small dataset to trigger the warning
+    small_data = pd.DataFrame(
+        {
+            "x": np.random.randn(15),
+            "y": np.random.choice([0, 1], 15),
+            "z": np.random.randn(15),
+        }
+    )
+
+    with pytest.warns(UserWarning, match="Jackknife validation set is small"):
+        # With jackknife_fraction=0.8, validation set will be 15 * 0.2 = 3 < 20
+        result = feature_importance(
+            small_data,
+            x="x",
+            y="y",
+            mode="jackknife",
+            jackknife_fraction=0.8,
+            iterations=5,
+        )
+        assert result["mode"] == "jackknife"
+
+
+# Test no warning for adequate validation sets
+def test_feature_importance_no_warning_adequate_validation():
+    # Create a larger dataset that shouldn't trigger warnings
+    large_data = pd.DataFrame(
+        {
+            "x": np.random.randn(150),
+            "y": np.random.choice([0, 1], 150),
+            "z": np.random.randn(150),
+        }
+    )
+
+    # This should not trigger any warnings (150 * 0.2 = 30 validation samples >= 20)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # Turn warnings into errors
+        try:
+            result = feature_importance(
+                large_data,
+                x="x",
+                y="y",
+                mode="jackknife",
+                jackknife_fraction=0.8,
+                iterations=5,
+            )
+            assert result["mode"] == "jackknife"
+        except UserWarning:
+            pytest.fail("Unexpected warning for adequate validation set size")
