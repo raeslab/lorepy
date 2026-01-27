@@ -7,6 +7,7 @@ Tests cover:
 - _get_dots_df: scatter dot positioning
 - loreplot: main plotting function
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -17,19 +18,17 @@ from sklearn.svm import SVC
 
 from lorepy.lorepy import _get_area_df, _get_dots_df, _prepare_data, loreplot
 
-
 # =============================================================================
 # Tests for _prepare_data
 # =============================================================================
+
 
 class TestPrepareData:
     """Tests for the _prepare_data function."""
 
     def test_basic_preparation(self, small_deterministic_data):
         """Test basic data preparation without confounders."""
-        X_reg, y_reg, x_range = _prepare_data(
-            small_deterministic_data, "x", "y", []
-        )
+        X_reg, y_reg, x_range = _prepare_data(small_deterministic_data, "x", "y", [])
 
         assert isinstance(X_reg, np.ndarray)
         assert isinstance(y_reg, np.ndarray)
@@ -71,9 +70,7 @@ class TestPrepareData:
 
     def test_x_range_calculation(self, binary_sample_data):
         """Test that x_range is correctly calculated from data."""
-        X_reg, y_reg, x_range = _prepare_data(
-            binary_sample_data, "x", "y", []
-        )
+        X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         expected_min = binary_sample_data["x"].min()
         expected_max = binary_sample_data["x"].max()
@@ -87,9 +84,7 @@ class TestPrepareData:
         binary_sample_data["w"] = binary_sample_data["x"] * 2
 
         confounders = [("z", 5.0), ("w", 10.0)]
-        X_reg, y_reg, x_range = _prepare_data(
-            binary_sample_data, "x", "y", confounders
-        )
+        X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", confounders)
 
         # X should have 3 columns: x, z, w
         assert X_reg.shape[1] == 3
@@ -108,6 +103,7 @@ class TestPrepareData:
 # =============================================================================
 # Tests for _get_area_df
 # =============================================================================
+
 
 class TestGetAreaDf:
     """Tests for the _get_area_df function."""
@@ -211,6 +207,7 @@ class TestGetAreaDf:
 # Tests for _get_dots_df
 # =============================================================================
 
+
 class TestGetDotsDf:
     """Tests for the _get_dots_df function."""
 
@@ -280,7 +277,7 @@ class TestGetDotsDf:
 
             # Calculate expected band
             min_val = sum(proba[:class_idx])
-            max_val = sum(proba[:class_idx + 1])
+            max_val = sum(proba[: class_idx + 1])
 
             # y should be within the band (with some tolerance for margin)
             assert row["y"] >= min_val - 0.01
@@ -299,6 +296,7 @@ class TestGetDotsDf:
 # =============================================================================
 # Tests for loreplot
 # =============================================================================
+
 
 class TestLoreplot:
     """Tests for the main loreplot function."""
@@ -363,8 +361,11 @@ class TestLoreplot:
 
         # No scatter collections should be added
         # Note: area plot might add some collections, but scatter specifically won't
-        scatter_collections = [c for c in ax.collections
-                              if hasattr(c, 'get_offsets') and len(c.get_offsets()) > 0]
+        scatter_collections = [
+            c
+            for c in ax.collections
+            if hasattr(c, "get_offsets") and len(c.get_offsets()) > 0
+        ]
         # When add_dots=False, there should be no scatter points
         for c in scatter_collections:
             offsets = c.get_offsets()
@@ -395,16 +396,22 @@ class TestLoreplot:
         """Test that dots are not added when confounders are specified."""
         fig, ax = plt.subplots()
         loreplot(
-            binary_sample_data, "x", "y",
+            binary_sample_data,
+            "x",
+            "y",
             ax=ax,
             add_dots=True,  # Request dots
-            confounders=[("z", 5.0)]  # But confounders should prevent them
+            confounders=[("z", 5.0)],  # But confounders should prevent them
         )
 
         # With confounders, dots should not be added even if add_dots=True
         # Check there are no scatter points with many offsets
-        scatter_with_data = [c for c in ax.collections
-                            if hasattr(c, 'get_offsets') and len(c.get_offsets()) == len(binary_sample_data)]
+        scatter_with_data = [
+            c
+            for c in ax.collections
+            if hasattr(c, "get_offsets")
+            and len(c.get_offsets()) == len(binary_sample_data)
+        ]
         assert len(scatter_with_data) == 0
 
         plt.close()
@@ -429,9 +436,7 @@ class TestLoreplot:
         """Test that scatter_kws are passed through."""
         fig, ax = plt.subplots()
         loreplot(
-            binary_sample_data, "x", "y",
-            ax=ax,
-            scatter_kws={"s": 100, "marker": "^"}
+            binary_sample_data, "x", "y", ax=ax, scatter_kws={"s": 100, "marker": "^"}
         )
 
         plt.close()
@@ -439,12 +444,7 @@ class TestLoreplot:
     def test_kwargs_passed_to_area_plot(self, binary_sample_data):
         """Test that kwargs are passed to the area plot."""
         fig, ax = plt.subplots()
-        loreplot(
-            binary_sample_data, "x", "y",
-            ax=ax,
-            alpha=0.5,
-            linestyle="-"
-        )
+        loreplot(binary_sample_data, "x", "y", ax=ax, alpha=0.5, linestyle="-")
 
         plt.close()
 
@@ -466,6 +466,7 @@ class TestLoreplot:
 # =============================================================================
 # Edge Case Tests
 # =============================================================================
+
 
 class TestEdgeCases:
     """Tests for edge cases and error handling."""

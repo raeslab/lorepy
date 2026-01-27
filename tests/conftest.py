@@ -1,11 +1,11 @@
 """
 Shared test fixtures for lorepy tests.
 """
+
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 
 
 @pytest.fixture
@@ -32,11 +32,13 @@ def multiclass_sample_data(random_seed):
     """
     Create sample data with three classes for multi-class classification.
     """
-    X = np.concatenate([
-        np.random.randint(0, 5, 30),
-        np.random.randint(3, 8, 30),
-        np.random.randint(6, 12, 30)
-    ])
+    X = np.concatenate(
+        [
+            np.random.randint(0, 5, 30),
+            np.random.randint(3, 8, 30),
+            np.random.randint(6, 12, 30),
+        ]
+    )
     y = [0] * 30 + [1] * 30 + [2] * 30
     z = X + np.random.randn(90) * 0.3
     return pd.DataFrame({"x": X.astype(float), "y": y, "z": z})
@@ -63,11 +65,13 @@ def data_with_nan(random_seed):
 @pytest.fixture
 def small_deterministic_data():
     """Small, deterministic dataset for precise testing."""
-    return pd.DataFrame({
-        "x": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0],
-        "y": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-        "z": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4]
-    })
+    return pd.DataFrame(
+        {
+            "x": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0],
+            "y": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+            "z": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4],
+        }
+    )
 
 
 @pytest.fixture
@@ -93,11 +97,13 @@ def fitted_multiclass_model(multiclass_sample_data):
 @pytest.fixture
 def single_class_data():
     """Data with only one class - should cause issues."""
-    return pd.DataFrame({
-        "x": [1.0, 2.0, 3.0, 4.0, 5.0],
-        "y": [0, 0, 0, 0, 0],
-        "z": [0.1, 0.2, 0.3, 0.4, 0.5]
-    })
+    return pd.DataFrame(
+        {
+            "x": [1.0, 2.0, 3.0, 4.0, 5.0],
+            "y": [0, 0, 0, 0, 0],
+            "z": [0.1, 0.2, 0.3, 0.4, 0.5],
+        }
+    )
 
 
 @pytest.fixture
@@ -118,4 +124,5 @@ def string_class_labels(random_seed):
 def custom_colormap():
     """Custom colormap for testing uncertainty_plot."""
     from matplotlib.colors import ListedColormap
+
     return ListedColormap(["red", "green", "blue"])

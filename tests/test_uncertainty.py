@@ -7,23 +7,22 @@ Tests cover:
 - uncertainty_plot: main uncertainty visualization function
 - feature_importance: public API for feature importance
 """
+
 import numpy as np
 import pandas as pd
 import pytest
 import warnings
 from matplotlib import pyplot as plt
-from matplotlib.colors import ListedColormap
-from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
 from lorepy import uncertainty_plot, feature_importance
 from lorepy.uncertainty import _get_uncertainty_data, _get_feature_importance
 from lorepy.lorepy import _prepare_data
 
-
 # =============================================================================
 # Tests for _get_uncertainty_data
 # =============================================================================
+
 
 class TestGetUncertaintyData:
     """Tests for the _get_uncertainty_data function."""
@@ -33,9 +32,7 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         output, long_df = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=10
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=10
         )
 
         # Check output DataFrame structure
@@ -58,10 +55,13 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         output, long_df = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
+            "x",
+            X_reg,
+            y_reg,
+            x_range,
             mode="jackknife",
             jackknife_fraction=0.8,
-            iterations=10
+            iterations=10,
         )
 
         assert isinstance(output, pd.DataFrame)
@@ -72,9 +72,7 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         output, _ = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=50
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=50
         )
 
         # For each row, bounds should be ordered: min <= low_95 <= low_50 <= mean <= high_50 <= high_95 <= max
@@ -89,9 +87,7 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         output, _ = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=10
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=10
         )
 
         for col in ["min", "mean", "max", "low_95", "high_95", "low_50", "high_50"]:
@@ -104,9 +100,7 @@ class TestGetUncertaintyData:
 
         # With very few iterations, expect wider intervals
         output_few, long_few = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=5
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=5
         )
 
         # Long_df should have iterations * 200 (num points) * num_classes rows
@@ -119,10 +113,13 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", confounders)
 
         output, _ = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
+            "x",
+            X_reg,
+            y_reg,
+            x_range,
             mode="resample",
             iterations=10,
-            confounders=confounders
+            confounders=confounders,
         )
 
         assert isinstance(output, pd.DataFrame)
@@ -134,10 +131,7 @@ class TestGetUncertaintyData:
         svc = SVC(probability=True)
 
         output, _ = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=10,
-            clf=svc
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=10, clf=svc
         )
 
         assert isinstance(output, pd.DataFrame)
@@ -148,9 +142,7 @@ class TestGetUncertaintyData:
 
         with pytest.raises(NotImplementedError):
             _get_uncertainty_data(
-                "x", X_reg, y_reg, x_range,
-                mode="invalid_mode",
-                iterations=10
+                "x", X_reg, y_reg, x_range, mode="invalid_mode", iterations=10
             )
 
     def test_output_has_all_categories(self, binary_sample_data):
@@ -158,9 +150,7 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         output, _ = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=10
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=10
         )
 
         categories = output["variable"].unique()
@@ -172,9 +162,7 @@ class TestGetUncertaintyData:
         X_reg, y_reg, x_range = _prepare_data(multiclass_sample_data, "x", "y", [])
 
         output, _ = _get_uncertainty_data(
-            "x", X_reg, y_reg, x_range,
-            mode="resample",
-            iterations=10
+            "x", X_reg, y_reg, x_range, mode="resample", iterations=10
         )
 
         categories = output["variable"].unique()
@@ -184,6 +172,7 @@ class TestGetUncertaintyData:
 # =============================================================================
 # Tests for _get_feature_importance
 # =============================================================================
+
 
 class TestGetFeatureImportance:
     """Tests for the _get_feature_importance function."""
@@ -233,9 +222,7 @@ class TestGetFeatureImportance:
 
         with pytest.warns(UserWarning, match="Bootstrap resampling mode"):
             result = _get_feature_importance(
-                "x", X_reg, y_reg,
-                mode="resample",
-                iterations=10
+                "x", X_reg, y_reg, mode="resample", iterations=10
             )
 
         assert result["mode"] == "resample"
@@ -245,9 +232,7 @@ class TestGetFeatureImportance:
         X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
 
         result = _get_feature_importance(
-            "x", X_reg, y_reg,
-            mode="jackknife",
-            iterations=10
+            "x", X_reg, y_reg, mode="jackknife", iterations=10
         )
 
         assert result["mode"] == "jackknife"
@@ -258,9 +243,7 @@ class TestGetFeatureImportance:
 
         with pytest.raises(NotImplementedError):
             _get_feature_importance(
-                "x", X_reg, y_reg,
-                mode="invalid_mode",
-                iterations=10
+                "x", X_reg, y_reg, mode="invalid_mode", iterations=10
             )
 
     def test_p_value_in_valid_range(self, binary_sample_data):
@@ -303,11 +286,7 @@ class TestGetFeatureImportance:
         X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
         svc = SVC(probability=True)
 
-        result = _get_feature_importance(
-            "x", X_reg, y_reg,
-            iterations=10,
-            clf=svc
-        )
+        result = _get_feature_importance("x", X_reg, y_reg, iterations=10, clf=svc)
 
         assert isinstance(result["mean_importance"], float)
 
@@ -317,17 +296,11 @@ class TestGetFeatureImportance:
 
         # Different fractions should produce different results
         result_80 = _get_feature_importance(
-            "x", X_reg, y_reg,
-            mode="jackknife",
-            jackknife_fraction=0.8,
-            iterations=10
+            "x", X_reg, y_reg, mode="jackknife", jackknife_fraction=0.8, iterations=10
         )
 
         result_50 = _get_feature_importance(
-            "x", X_reg, y_reg,
-            mode="jackknife",
-            jackknife_fraction=0.5,
-            iterations=10
+            "x", X_reg, y_reg, mode="jackknife", jackknife_fraction=0.5, iterations=10
         )
 
         # Both should produce valid results
@@ -338,6 +311,7 @@ class TestGetFeatureImportance:
 # =============================================================================
 # Tests for uncertainty_plot
 # =============================================================================
+
 
 class TestUncertaintyPlot:
     """Tests for the main uncertainty_plot function."""
@@ -379,9 +353,7 @@ class TestUncertaintyPlot:
         """Test custom x_range parameter."""
         custom_range = (0, 20)
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            x_range=custom_range,
-            iterations=10
+            binary_sample_data, "x", "y", x_range=custom_range, iterations=10
         )
 
         for ax in axs:
@@ -392,9 +364,7 @@ class TestUncertaintyPlot:
     def test_jackknife_mode(self, binary_sample_data):
         """Test jackknife mode."""
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            mode="jackknife",
-            iterations=10
+            binary_sample_data, "x", "y", mode="jackknife", iterations=10
         )
 
         assert len(axs) == 2
@@ -404,17 +374,13 @@ class TestUncertaintyPlot:
         """Test that invalid mode raises NotImplementedError."""
         with pytest.raises(NotImplementedError):
             uncertainty_plot(
-                binary_sample_data, "x", "y",
-                mode="invalid_mode",
-                iterations=10
+                binary_sample_data, "x", "y", mode="invalid_mode", iterations=10
             )
 
     def test_with_confounders(self, binary_sample_data):
         """Test plot with confounders."""
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            confounders=[("z", 5.0)],
-            iterations=10
+            binary_sample_data, "x", "y", confounders=[("z", 5.0)], iterations=10
         )
 
         assert len(axs) == 2
@@ -423,9 +389,7 @@ class TestUncertaintyPlot:
     def test_custom_colormap(self, binary_sample_data, custom_colormap):
         """Test plot with custom colormap."""
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            colormap=custom_colormap,
-            iterations=10
+            binary_sample_data, "x", "y", colormap=custom_colormap, iterations=10
         )
 
         assert len(axs) == 2
@@ -435,9 +399,7 @@ class TestUncertaintyPlot:
         """Test plot with custom classifier."""
         svc = SVC(probability=True)
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            clf=svc,
-            iterations=10
+            binary_sample_data, "x", "y", clf=svc, iterations=10
         )
 
         assert len(axs) == 2
@@ -447,9 +409,7 @@ class TestUncertaintyPlot:
         """Test plot with pre-existing axes."""
         fig, ax = plt.subplots(1, 2)
         returned_fig, returned_axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            ax=ax,
-            iterations=10
+            binary_sample_data, "x", "y", ax=ax, iterations=10
         )
 
         assert returned_axs[0] == ax[0]
@@ -461,29 +421,19 @@ class TestUncertaintyPlot:
         fig, ax = plt.subplots(1, 1)  # Only one axis
 
         with pytest.raises(AssertionError):
-            uncertainty_plot(
-                binary_sample_data, "x", "y",
-                ax=[ax],
-                iterations=10
-            )
+            uncertainty_plot(binary_sample_data, "x", "y", ax=[ax], iterations=10)
         plt.close()
 
     def test_multiclass_creates_correct_number_of_axes(self, multiclass_sample_data):
         """Test that multiclass data creates correct number of axes."""
-        fig, axs = uncertainty_plot(
-            multiclass_sample_data, "x", "y",
-            iterations=10
-        )
+        fig, axs = uncertainty_plot(multiclass_sample_data, "x", "y", iterations=10)
 
         assert len(axs) == 3  # Three classes
         plt.close()
 
     def test_plot_has_fill_between(self, binary_sample_data):
         """Test that plot includes fill_between elements."""
-        fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            iterations=10
-        )
+        fig, axs = uncertainty_plot(binary_sample_data, "x", "y", iterations=10)
 
         # Each axis should have collections from fill_between
         for ax in axs:
@@ -492,10 +442,7 @@ class TestUncertaintyPlot:
 
     def test_plot_has_line(self, binary_sample_data):
         """Test that plot includes mean line."""
-        fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            iterations=10
-        )
+        fig, axs = uncertainty_plot(binary_sample_data, "x", "y", iterations=10)
 
         # Each axis should have at least one line (the mean)
         for ax in axs:
@@ -507,15 +454,13 @@ class TestUncertaintyPlot:
 # Tests for public feature_importance function
 # =============================================================================
 
+
 class TestPublicFeatureImportance:
     """Tests for the public feature_importance API."""
 
     def test_basic_usage(self, binary_sample_data):
         """Test basic usage of feature_importance."""
-        result = feature_importance(
-            binary_sample_data, x="x", y="y",
-            iterations=10
-        )
+        result = feature_importance(binary_sample_data, x="x", y="y", iterations=10)
 
         assert result["feature"] == "x"
         assert result["iterations"] == 10
@@ -523,9 +468,7 @@ class TestPublicFeatureImportance:
     def test_with_confounders(self, binary_sample_data):
         """Test feature_importance with confounders."""
         result = feature_importance(
-            binary_sample_data, x="x", y="y",
-            confounders=[("z", 5.0)],
-            iterations=10
+            binary_sample_data, x="x", y="y", confounders=[("z", 5.0)], iterations=10
         )
 
         assert result["feature"] == "x"
@@ -534,9 +477,7 @@ class TestPublicFeatureImportance:
         """Test feature_importance with custom classifier."""
         svc = SVC(probability=True)
         result = feature_importance(
-            binary_sample_data, x="x", y="y",
-            clf=svc,
-            iterations=10
+            binary_sample_data, x="x", y="y", clf=svc, iterations=10
         )
 
         assert isinstance(result["mean_importance"], float)
@@ -544,9 +485,7 @@ class TestPublicFeatureImportance:
     def test_jackknife_mode(self, binary_sample_data):
         """Test feature_importance with jackknife mode."""
         result = feature_importance(
-            binary_sample_data, x="x", y="y",
-            mode="jackknife",
-            iterations=10
+            binary_sample_data, x="x", y="y", mode="jackknife", iterations=10
         )
 
         assert result["mode"] == "jackknife"
@@ -555,26 +494,28 @@ class TestPublicFeatureImportance:
         """Test that resample mode issues a warning."""
         with pytest.warns(UserWarning, match="Bootstrap resampling mode"):
             result = feature_importance(
-                binary_sample_data, x="x", y="y",
-                mode="resample",
-                iterations=10
+                binary_sample_data, x="x", y="y", mode="resample", iterations=10
             )
 
         assert result["mode"] == "resample"
 
     def test_small_validation_set_warning(self):
         """Test warning for small validation sets in jackknife mode."""
-        small_data = pd.DataFrame({
-            "x": np.random.randn(15),
-            "y": np.random.choice([0, 1], 15),
-        })
+        small_data = pd.DataFrame(
+            {
+                "x": np.random.randn(15),
+                "y": np.random.choice([0, 1], 15),
+            }
+        )
 
         with pytest.warns(UserWarning, match="Jackknife validation set is small"):
             result = feature_importance(
-                small_data, x="x", y="y",
+                small_data,
+                x="x",
+                y="y",
                 mode="jackknife",
                 jackknife_fraction=0.8,
-                iterations=5
+                iterations=5,
             )
 
         assert result["mode"] == "jackknife"
@@ -582,20 +523,24 @@ class TestPublicFeatureImportance:
     def test_no_warning_adequate_validation(self):
         """Test no warning for adequate validation sets."""
         np.random.seed(42)
-        large_data = pd.DataFrame({
-            "x": np.random.randn(150),
-            "y": np.random.choice([0, 1], 150),
-        })
+        large_data = pd.DataFrame(
+            {
+                "x": np.random.randn(150),
+                "y": np.random.choice([0, 1], 150),
+            }
+        )
 
         # This should not trigger the small validation warning
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             try:
                 result = feature_importance(
-                    large_data, x="x", y="y",
+                    large_data,
+                    x="x",
+                    y="y",
                     mode="jackknife",
                     jackknife_fraction=0.8,
-                    iterations=5
+                    iterations=5,
                 )
                 assert result["mode"] == "jackknife"
             except UserWarning as e:
@@ -606,8 +551,7 @@ class TestPublicFeatureImportance:
         """Test that public function output matches internal function."""
         # Get result from public function
         public_result = feature_importance(
-            binary_sample_data, x="x", y="y",
-            iterations=10
+            binary_sample_data, x="x", y="y", iterations=10
         )
 
         # Both should have the same keys
@@ -633,15 +577,13 @@ class TestPublicFeatureImportance:
 # Edge Cases
 # =============================================================================
 
+
 class TestUncertaintyEdgeCases:
     """Edge case tests for uncertainty module."""
 
     def test_very_few_iterations(self, binary_sample_data):
         """Test with minimum iterations."""
-        fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
-            iterations=2
-        )
+        fig, axs = uncertainty_plot(binary_sample_data, "x", "y", iterations=2)
 
         assert len(axs) == 2
         plt.close()
@@ -649,10 +591,12 @@ class TestUncertaintyEdgeCases:
     def test_high_jackknife_fraction(self, binary_sample_data):
         """Test with high jackknife fraction."""
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
+            binary_sample_data,
+            "x",
+            "y",
             mode="jackknife",
             jackknife_fraction=0.95,
-            iterations=10
+            iterations=10,
         )
 
         assert len(axs) == 2
@@ -661,10 +605,12 @@ class TestUncertaintyEdgeCases:
     def test_low_jackknife_fraction(self, binary_sample_data):
         """Test with low jackknife fraction."""
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y",
+            binary_sample_data,
+            "x",
+            "y",
             mode="jackknife",
             jackknife_fraction=0.5,
-            iterations=10
+            iterations=10,
         )
 
         assert len(axs) == 2
@@ -672,10 +618,7 @@ class TestUncertaintyEdgeCases:
 
     def test_string_class_labels(self, string_class_labels):
         """Test with string class labels."""
-        fig, axs = uncertainty_plot(
-            string_class_labels, "x", "y",
-            iterations=10
-        )
+        fig, axs = uncertainty_plot(string_class_labels, "x", "y", iterations=10)
 
         assert len(axs) == 2
         plt.close()
@@ -683,10 +626,7 @@ class TestUncertaintyEdgeCases:
     def test_nan_handling(self, data_with_nan):
         """Test that NaN values are handled properly."""
         # Should not raise - NaN rows should be dropped by _prepare_data
-        fig, axs = uncertainty_plot(
-            data_with_nan, "x", "y",
-            iterations=10
-        )
+        fig, axs = uncertainty_plot(data_with_nan, "x", "y", iterations=10)
 
         assert len(axs) == 2
         plt.close()
