@@ -11,11 +11,33 @@ If you prefer an R implementation of this package, have a look at [loreplotr](ht
 
 ## Why use lorepy ?
 
-Lorepy offers distinct advantages over traditional methods like stacked bar plots. By employing a linear model, Lorepy 
-captures overall trends across the entire feature range. It avoids arbitrary cut-offs and segmentation, enabling the 
+Lorepy offers distinct advantages over traditional methods like stacked bar plots. By employing a linear model, Lorepy
+captures overall trends across the entire feature range. It avoids arbitrary cut-offs and segmentation, enabling the
 visualization of uncertainty throughout the data range.
 
 You can find examples of the Iris data visualized using stacked bar plots [here](https://github.com/raeslab/lorepy/blob/main/docs/lorepy_vs_bar_plots.md) for comparison.
+
+## How lorepy works
+
+Under the hood, the default model is a multinomial logistic regression (scikit-learn's `LogisticRegression` with L2
+regularization, C=1.0). For *K* classes it estimates coefficient vectors **β**\_k and intercepts β\_{k0}, then computes
+class probabilities via the softmax function: *P(Y=k | x) = exp(**β**\_k · x + β\_{k0}) / Σ\_j exp(**β**\_j · x + β\_{j0})*.
+Because these probabilities are guaranteed to sum to one for every value of *x*, they can be directly rendered as a
+stacked area chart. Lorepy evaluates the fitted model at 200 evenly spaced points across the observed feature range,
+producing smooth probability curves that reveal how the expected class composition shifts continuously with the
+independent variable. When confounders are specified, they are included as additional features during model fitting but
+held constant at user-supplied reference values during prediction, effectively marginalizing their influence. Sample
+dots are positioned by drawing a random *y*-coordinate within the predicted probability band of each observation's true
+class, giving an intuitive sense of both class membership and local model confidence.
+
+Concretely, the height of each colored band at a given *x*-value represents the model's estimated proportion of that
+class: a band spanning 60% of the y-axis means the model estimates that class accounts for 60% of observations at that
+point along the feature. As *x* increases, bands that widen indicate classes with a growing estimated proportion, while
+narrowing bands indicate classes becoming rarer. A class that dominates the plot across the full range has a
+consistently high estimated proportion regardless of the feature value, whereas a sharp crossover between two bands
+pinpoints where one class overtakes another. Because the bands always sum to one, the plot naturally encodes a zero-sum
+trade-off: one class can only grow in estimated proportion at the expense of others, making it straightforward to read
+both absolute and relative shifts directly from the visualization.
 
 ## Installation
 
