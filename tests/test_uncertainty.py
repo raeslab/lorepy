@@ -224,7 +224,9 @@ class TestGetFeatureImportance:
         # For an informative feature, permuting should increase log loss
         # This is a soft check - the relationship holds on average
         if result["mean_importance"] > 0:
-            assert result["mean_permuted_log_loss"] >= result["mean_validation_log_loss"]
+            assert (
+                result["mean_permuted_log_loss"] >= result["mean_validation_log_loss"]
+            )
 
     def test_feature_name_preserved(self, binary_sample_data):
         """Test that feature name is preserved in output."""
