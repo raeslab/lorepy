@@ -112,14 +112,13 @@ def _get_feature_importance(
             )
         elif mode == "resample":
             X_keep, X_val, y_keep, y_val = train_test_split(
-                X_reg, y_reg, train_size=1-resample_validation_fraction
+                X_reg, y_reg, train_size=1 - resample_validation_fraction
             )
             X_keep, y_keep = resample(X_keep, y_keep, replace=True)
         else:
             raise NotImplementedError(
                 f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
             )
-
 
         # Check for small validation sets that may affect statistical reliability
         if len(y_val) < 20:
