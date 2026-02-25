@@ -7,6 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.utils import resample
 from sklearn.inspection import permutation_importance
+from sklearn.metrics import log_loss
 
 from lorepy.lorepy import _get_area_df, _prepare_data
 
@@ -17,21 +18,21 @@ def _get_uncertainty_data(
     y_reg,
     x_range,
     mode="resample",
-    jackknife_fraction: float = 0.8,
+    subsampling_fraction: float = 0.8,
     iterations: int = 100,
     confounders=None,
     clf=None,
 ):
     """
-    Estimates uncertainty in model predictions using resampling or jackknife methods.
+    Estimates uncertainty in model predictions using resampling or random subsampling methods.
 
     :param x: Name of the feature variable to analyze.
     :param X_reg: Feature matrix for regression/classification.
     :param y_reg: Target variable.
     :param x_range: Tuple (min, max) specifying the range of values for the feature variable `x` to evaluate.
-    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
-    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
-    :param iterations: Number of resampling or jackknife iterations.
+    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "random_subsampling".
+    :param subsampling_fraction: Fraction of data to keep in each random subsampling iteration (only used if mode="random_subsampling").
+    :param iterations: Number of resampling or random subsampling iterations.
     :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
     :return: Tuple containing output DataFrame with aggregated uncertainty statistics and long_df DataFrame with all resampled predictions.
@@ -40,15 +41,15 @@ def _get_uncertainty_data(
 
     areas = []
     for i in range(iterations):
-        if mode == "jackknife":
+        if mode == "random_subsampling":
             X_keep, _, y_keep, _ = train_test_split(
-                X_reg, y_reg, train_size=jackknife_fraction
+                X_reg, y_reg, train_size=subsampling_fraction
             )
         elif mode == "resample":
             X_keep, y_keep = resample(X_reg, y_reg, replace=True)
         else:
             raise NotImplementedError(
-                f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
+                f"Mode {mode} is unsupported, only random_subsampling and resample are valid modes"
             )
 
         lg = LogisticRegression() if clf is None else clf
@@ -82,59 +83,57 @@ def _get_feature_importance(
     x: str,
     X_reg,
     y_reg,
-    mode="resample",
-    jackknife_fraction: float = 0.8,
+    mode="random_subsampling",
+    subsampling_fraction: float = 0.8,
+    resample_validation_fraction: float = 0.2,
     iterations: int = 100,
     clf=None,
 ):
     """
     Estimates the importance of the x-feature in predicting class labels using permutation-based
-    feature importance with resampling or jackknife methods. Uses accuracy as the performance metric.
+    feature importance with resampling or random subsampling methods. Uses log loss (cross-entropy) as the
+    performance metric, which evaluates the full predicted probability distribution rather than
+    just hard class predictions.
 
     :param x: Name of the feature variable to analyze for importance.
     :param X_reg: Feature matrix for regression/classification.
     :param y_reg: Target variable.
-    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
-    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
-    :param iterations: Number of resampling or jackknife iterations.
+    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "random_subsampling".
+    :param subsampling_fraction: Fraction of data to keep in each random subsampling iteration (only used if mode="random_subsampling").
+    :param resample_validation_fraction: Fraction of data to use for validation in resampling mode (only used if mode="resample").
+    :param iterations: Number of resampling or random subsampling iterations.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted log loss statistics, and significance metrics.
     """
 
     importance_scores = []
-
-    # Issue warnings about statistical considerations for different modes
-    if mode == "resample":
-        warnings.warn(
-            "Bootstrap resampling mode uses the same data for training and validation, "
-            "which may lead to overoptimistic importance scores with some models. "
-            "Consider using mode='jackknife' for more conservative estimates with proper train/test splits.",
-            UserWarning,
-            stacklevel=3,
-        )
+    validation_log_losses = []
+    permuted_log_losses = []
 
     for i in range(iterations):
-        if mode == "jackknife":
+        if mode == "random_subsampling":
             X_keep, X_val, y_keep, y_val = train_test_split(
-                X_reg, y_reg, train_size=jackknife_fraction
+                X_reg, y_reg, train_size=subsampling_fraction
             )
-
-            # Check for small validation sets that may affect statistical reliability
-            if len(y_val) < 20:
-                warnings.warn(
-                    f"Jackknife validation set is small (n={len(y_val)}). "
-                    f"Small validation sets may lead to unreliable importance estimates. "
-                    f"Consider increasing jackknife_fraction (currently {jackknife_fraction}) "
-                    f"or using a larger dataset for more stable results.",
-                    UserWarning,
-                    stacklevel=3,
-                )
         elif mode == "resample":
-            X_keep, y_keep = resample(X_reg, y_reg, replace=True)
-            X_val, y_val = X_reg, y_reg  # Use full data for validation
+            X_keep, X_val, y_keep, y_val = train_test_split(
+                X_reg, y_reg, train_size=1 - resample_validation_fraction
+            )
+            X_keep, y_keep = resample(X_keep, y_keep, replace=True)
         else:
             raise NotImplementedError(
-                f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
+                f"Mode {mode} is unsupported, only random_subsampling and resample are valid modes"
+            )
+
+        # Check for small validation sets that may affect statistical reliability
+        if len(y_val) < 20:
+            warnings.warn(
+                f"The validation set is small (n={len(y_val)}). "
+                f"Small validation sets may lead to unreliable importance estimates. "
+                f"Consider decreasing subsampling_fraction (currently {subsampling_fraction}), increasing resample_validation_fraction (currently {resample_validation_fraction}), "
+                f"or using a larger dataset for more stable results.",
+                UserWarning,
+                stacklevel=3,
             )
 
         # Fit model and use sklearn's permutation_importance
@@ -142,26 +141,41 @@ def _get_feature_importance(
         lg.fit(X_keep, y_keep)
 
         # Use permutation_importance to get feature importance for first feature (x)
-        # This handles proper train/test splits internally and avoids training data leakage
+        # Using neg_log_loss to evaluate the full probability distribution rather than
+        # just hard class predictions, which is more appropriate for lorepy's probability-based plots
         perm_result = permutation_importance(
             lg,
             X_val,
             y_val,
             n_repeats=1,  # We handle iterations in outer loop
             random_state=None,  # Allow randomness for each iteration
-            scoring="accuracy",
+            scoring="neg_log_loss",
             n_jobs=1,
         )
 
         # Extract importance for first feature (x-feature)
+        # importance = neg_log_loss_original - neg_log_loss_permuted
+        # Positive importance means permuting the feature increases log loss (worsens predictions)
         importance = perm_result.importances_mean[0]
         importance_scores.append(importance)
 
+        # Track validation and permuted log losses
+        val_log_loss = log_loss(y_val, lg.predict_proba(X_val), labels=lg.classes_)
+        validation_log_losses.append(val_log_loss)
+        # Since importance = (-val_log_loss) - (-perm_log_loss) = perm_log_loss - val_log_loss
+        permuted_log_losses.append(val_log_loss + importance)
+
     importance_scores = np.array(importance_scores)
+    validation_log_losses = np.array(validation_log_losses)
+    permuted_log_losses = np.array(permuted_log_losses)
 
     # Calculate statistics
     mean_importance = np.mean(importance_scores)
     std_importance = np.std(importance_scores)
+    mean_validation_log_loss = np.mean(validation_log_losses)
+    std_validation_log_loss = np.std(validation_log_losses)
+    mean_permuted_log_loss = np.mean(permuted_log_losses)
+    std_permuted_log_loss = np.std(permuted_log_losses)
     ci_95_low = np.percentile(importance_scores, 2.5)
     ci_95_high = np.percentile(importance_scores, 97.5)
 
@@ -182,6 +196,10 @@ def _get_feature_importance(
         "std_importance": std_importance,
         "importance_95ci_low": ci_95_low,
         "importance_95ci_high": ci_95_high,
+        "mean_validation_log_loss": mean_validation_log_loss,
+        "std_validation_log_loss": std_validation_log_loss,
+        "mean_permuted_log_loss": mean_permuted_log_loss,
+        "std_permuted_log_loss": std_permuted_log_loss,
         "proportion_positive": significant_positive,
         "proportion_negative": significant_negative,
         "p_value": p_value,
@@ -198,7 +216,7 @@ def uncertainty_plot(
     y: str,
     x_range=None,
     mode="resample",
-    jackknife_fraction=0.8,
+    subsampling_fraction=0.8,
     iterations=100,
     confounders=None,
     colormap=None,
@@ -213,9 +231,9 @@ def uncertainty_plot(
     :param x: Needs to be a numerical feature
     :param y: Categorical feature
     :param x_range: Either None (range will be selected automatically) or a tuple with min and max value for the x-axis
-    :param mode: Sampling method, either "resample" (bootstrap) or "jackknife" (default = "resample")
-    :param jackknife_fraction: Fraction of data to retain for each jackknife sample (default = 0.8)
-    :param iterations: Number of iterations for resampling or jackknife (default = 100)
+    :param mode: Sampling method, either "resample" (bootstrap) or "random_subsampling" (default = "resample")
+    :param subsampling_fraction: Fraction of data to retain for each random subsampling iteration (default = 0.8)
+    :param iterations: Number of iterations for resampling or random subsampling (default = 100)
     :param confounders: List of tuples with the feature and reference value e.g., [("BMI", 25)] will use a reference of 25 for plots
     :param colormap: Colormap to use for the plot, default is None in which case matplotlib's default will be used
     :param clf: Provide a different scikit-learn classifier for the function. Should implement the predict_proba() and fit(). If None a LogisticRegression will be used.
@@ -235,7 +253,7 @@ def uncertainty_plot(
         y_reg,
         x_range,
         mode=mode,
-        jackknife_fraction=jackknife_fraction,
+        subsampling_fraction=subsampling_fraction,
         iterations=iterations,
         confounders=confounders,
         clf=clf,
@@ -278,14 +296,17 @@ def feature_importance(
     x: str,
     y: str,
     mode="resample",
-    jackknife_fraction=0.8,
+    subsampling_fraction=0.8,
+    resample_validation_fraction=0.2,
     iterations=100,
     confounders=None,
     clf=None,
 ):
     """
     Estimates the importance of a feature in predicting class labels using permutation-based
-    feature importance with resampling or jackknife methods. Uses accuracy as the performance metric.
+    feature importance with resampling or random subsampling methods. Uses log loss (cross-entropy) as the
+    performance metric, which evaluates the full predicted probability distribution rather than
+    just hard class predictions.
 
     This function provides statistical assessment of whether the x-feature is significantly
     associated with the class distribution (y-variable). Higher importance scores indicate
@@ -294,12 +315,13 @@ def feature_importance(
     :param data: The input dataframe containing all features and target variable.
     :param x: The name of the feature to analyze for importance.
     :param y: The name of the target variable.
-    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
-    :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
-    :param iterations: Number of resampling or jackknife iterations.
+    :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "random_subsampling".
+    :param subsampling_fraction: Fraction of data to keep in each random subsampling iteration (only used if mode="random_subsampling").
+    :param resample_validation_fraction: Fraction of data to use for validation in resampling mode (only used if mode="resample").
+    :param iterations: Number of resampling or random subsampling iterations.
     :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted log loss statistics, and significance metrics.
 
     Example:
         >>> import pandas as pd
@@ -325,7 +347,8 @@ def feature_importance(
         X_reg=X_reg,
         y_reg=y_reg,
         mode=mode,
-        jackknife_fraction=jackknife_fraction,
+        subsampling_fraction=subsampling_fraction,
+        resample_validation_fraction=resample_validation_fraction,
         iterations=iterations,
         clf=clf,
     )
