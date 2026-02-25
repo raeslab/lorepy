@@ -189,6 +189,10 @@ class TestGetFeatureImportance:
             "std_importance",
             "importance_95ci_low",
             "importance_95ci_high",
+            "mean_validation_accuracy",
+            "std_validation_accuracy",
+            "mean_permuted_accuracy",
+            "std_permuted_accuracy",
             "proportion_positive",
             "proportion_negative",
             "p_value",
@@ -199,6 +203,28 @@ class TestGetFeatureImportance:
 
         for key in expected_keys:
             assert key in result, f"Missing key: {key}"
+
+    def test_accuracy_values_in_valid_range(self, binary_sample_data):
+        """Test that accuracy values are between 0 and 1."""
+        X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
+
+        result = _get_feature_importance("x", X_reg, y_reg, iterations=10)
+
+        assert 0 <= result["mean_validation_accuracy"] <= 1
+        assert 0 <= result["mean_permuted_accuracy"] <= 1
+        assert result["std_validation_accuracy"] >= 0
+        assert result["std_permuted_accuracy"] >= 0
+
+    def test_importance_equals_accuracy_difference(self, binary_sample_data):
+        """Test that mean importance approximately equals the difference between validation and permuted accuracy."""
+        X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
+
+        result = _get_feature_importance("x", X_reg, y_reg, iterations=50)
+
+        # importance = validation_accuracy - permuted_accuracy (per iteration),
+        # so mean_importance should approximately equal the difference of means
+        expected_diff = result["mean_validation_accuracy"] - result["mean_permuted_accuracy"]
+        assert abs(result["mean_importance"] - expected_diff) < 0.05
 
     def test_feature_name_preserved(self, binary_sample_data):
         """Test that feature name is preserved in output."""
@@ -562,6 +588,10 @@ class TestPublicFeatureImportance:
             "std_importance",
             "importance_95ci_low",
             "importance_95ci_high",
+            "mean_validation_accuracy",
+            "std_validation_accuracy",
+            "mean_permuted_accuracy",
+            "std_permuted_accuracy",
             "proportion_positive",
             "proportion_negative",
             "p_value",

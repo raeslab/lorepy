@@ -233,10 +233,14 @@ print(stats['interpretation'])
 The function returns a dictionary with the following key statistics:
 
 - **`mean_importance`**: Average accuracy drop when x-feature is shuffled (higher = more important)
-- **`std_importance`**: Standard deviation of importance across iterations  
+- **`std_importance`**: Standard deviation of importance across iterations
 - **`importance_95ci_low/high`**: 95% confidence interval for the importance estimate
+- **`mean_validation_accuracy`**: Mean accuracy on the validation data across iterations
+- **`std_validation_accuracy`**: Standard deviation of the validation accuracy
+- **`mean_permuted_accuracy`**: Mean accuracy on the permuted data across iterations
+- **`std_permuted_accuracy`**: Standard deviation of the permuted accuracy
 - **`proportion_positive`**: Fraction of iterations where importance > 0 (feature helps prediction)
-- **`proportion_negative`**: Fraction of iterations where importance < 0 (feature hurts prediction)  
+- **`proportion_negative`**: Fraction of iterations where importance < 0 (feature hurts prediction)
 - **`p_value`**: Empirical p-value for statistical significance (< 0.05 typically considered significant)
 - **`interpretation`**: Human-readable summary of the results
 

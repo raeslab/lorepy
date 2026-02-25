@@ -100,10 +100,12 @@ def _get_feature_importance(
     :param resample_validation_fraction: Fraction of data to use for validation in resampling mode (only used if mode="resample").
     :param iterations: Number of resampling or jackknife iterations.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted accuracy statistics, and significance metrics.
     """
 
     importance_scores = []
+    validation_accuracies = []
+    permuted_accuracies = []
 
     for i in range(iterations):
         if mode == "jackknife":
@@ -151,11 +153,22 @@ def _get_feature_importance(
         importance = perm_result.importances_mean[0]
         importance_scores.append(importance)
 
+        # Track validation and permuted accuracies
+        val_accuracy = lg.score(X_val, y_val)
+        validation_accuracies.append(val_accuracy)
+        permuted_accuracies.append(val_accuracy - importance)
+
     importance_scores = np.array(importance_scores)
+    validation_accuracies = np.array(validation_accuracies)
+    permuted_accuracies = np.array(permuted_accuracies)
 
     # Calculate statistics
     mean_importance = np.mean(importance_scores)
     std_importance = np.std(importance_scores)
+    mean_validation_accuracy = np.mean(validation_accuracies)
+    std_validation_accuracy = np.std(validation_accuracies)
+    mean_permuted_accuracy = np.mean(permuted_accuracies)
+    std_permuted_accuracy = np.std(permuted_accuracies)
     ci_95_low = np.percentile(importance_scores, 2.5)
     ci_95_high = np.percentile(importance_scores, 97.5)
 
@@ -176,6 +189,10 @@ def _get_feature_importance(
         "std_importance": std_importance,
         "importance_95ci_low": ci_95_low,
         "importance_95ci_high": ci_95_high,
+        "mean_validation_accuracy": mean_validation_accuracy,
+        "std_validation_accuracy": std_validation_accuracy,
+        "mean_permuted_accuracy": mean_permuted_accuracy,
+        "std_permuted_accuracy": std_permuted_accuracy,
         "proportion_positive": significant_positive,
         "proportion_negative": significant_negative,
         "p_value": p_value,
@@ -295,7 +312,7 @@ def feature_importance(
     :param iterations: Number of resampling or jackknife iterations.
     :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted accuracy statistics, and significance metrics.
 
     Example:
         >>> import pandas as pd
