@@ -23,20 +23,20 @@ stats = feature_importance(
 print(stats)
 
 stats = feature_importance(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="jackknife"
+    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="random_subsampling"
 )
 print(stats)
 
 
-# Using jackknife instead of resample to assess uncertainty
+# Using random subsampling instead of resample to assess uncertainty
 uncertainty_plot(
     data=iris_df,
     x="sepal width (cm)",
     y="species",
     iterations=100,
-    jackknife_fraction=0.8,
+    subsampling_fraction=0.8,
 )
-plt.savefig("./docs/img/uncertainty_jackknife.png", dpi=150)
+plt.savefig("./docs/img/uncertainty_random_subsampling.png", dpi=150)
 plt.show()
 
 # Uncertainty plot with custom colors

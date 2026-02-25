@@ -2,7 +2,7 @@
 Comprehensive tests for lorepy.uncertainty module.
 
 Tests cover:
-- _get_uncertainty_data: uncertainty estimation via resampling/jackknife
+- _get_uncertainty_data: uncertainty estimation via resampling/random subsampling
 - _get_feature_importance: feature importance calculation
 - uncertainty_plot: main uncertainty visualization function
 - feature_importance: public API for feature importance
@@ -50,8 +50,8 @@ class TestGetUncertaintyData:
         # Check long_df structure
         assert isinstance(long_df, pd.DataFrame)
 
-    def test_basic_output_structure_jackknife(self, binary_sample_data):
-        """Test basic output structure with jackknife mode."""
+    def test_basic_output_structure_random_subsampling(self, binary_sample_data):
+        """Test basic output structure with random_subsampling mode."""
         X_reg, y_reg, x_range = _prepare_data(binary_sample_data, "x", "y", [])
 
         output, long_df = _get_uncertainty_data(
@@ -59,8 +59,8 @@ class TestGetUncertaintyData:
             X_reg,
             y_reg,
             x_range,
-            mode="jackknife",
-            jackknife_fraction=0.8,
+            mode="random_subsampling",
+            subsampling_fraction=0.8,
             iterations=10,
         )
 
@@ -253,15 +253,15 @@ class TestGetFeatureImportance:
 
         assert result["mode"] == "resample"
 
-    def test_mode_jackknife(self, binary_sample_data):
-        """Test jackknife mode."""
+    def test_mode_random_subsampling(self, binary_sample_data):
+        """Test random_subsampling mode."""
         X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
 
         result = _get_feature_importance(
-            "x", X_reg, y_reg, mode="jackknife", iterations=10
+            "x", X_reg, y_reg, mode="random_subsampling", iterations=10
         )
 
-        assert result["mode"] == "jackknife"
+        assert result["mode"] == "random_subsampling"
 
     def test_invalid_mode_raises_error(self, binary_sample_data):
         """Test that invalid mode raises NotImplementedError."""
@@ -316,17 +316,17 @@ class TestGetFeatureImportance:
 
         assert isinstance(result["mean_importance"], float)
 
-    def test_jackknife_fraction_parameter(self, binary_sample_data):
-        """Test that jackknife_fraction parameter is used."""
+    def test_subsampling_fraction_parameter(self, binary_sample_data):
+        """Test that subsampling_fraction parameter is used."""
         X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
 
         # Different fractions should produce different results
         result_80 = _get_feature_importance(
-            "x", X_reg, y_reg, mode="jackknife", jackknife_fraction=0.8, iterations=10
+            "x", X_reg, y_reg, mode="random_subsampling", subsampling_fraction=0.8, iterations=10
         )
 
         result_50 = _get_feature_importance(
-            "x", X_reg, y_reg, mode="jackknife", jackknife_fraction=0.5, iterations=10
+            "x", X_reg, y_reg, mode="random_subsampling", subsampling_fraction=0.5, iterations=10
         )
 
         # Both should produce valid results
@@ -387,10 +387,10 @@ class TestUncertaintyPlot:
             assert xlim == custom_range
         plt.close()
 
-    def test_jackknife_mode(self, binary_sample_data):
-        """Test jackknife mode."""
+    def test_random_subsampling_mode(self, binary_sample_data):
+        """Test random_subsampling mode."""
         fig, axs = uncertainty_plot(
-            binary_sample_data, "x", "y", mode="jackknife", iterations=10
+            binary_sample_data, "x", "y", mode="random_subsampling", iterations=10
         )
 
         assert len(axs) == 2
@@ -508,16 +508,16 @@ class TestPublicFeatureImportance:
 
         assert isinstance(result["mean_importance"], float)
 
-    def test_jackknife_mode(self, binary_sample_data):
-        """Test feature_importance with jackknife mode."""
+    def test_random_subsampling_mode(self, binary_sample_data):
+        """Test feature_importance with random_subsampling mode."""
         result = feature_importance(
-            binary_sample_data, x="x", y="y", mode="jackknife", iterations=10
+            binary_sample_data, x="x", y="y", mode="random_subsampling", iterations=10
         )
 
-        assert result["mode"] == "jackknife"
+        assert result["mode"] == "random_subsampling"
 
     def test_small_validation_set_warning(self):
-        """Test warning for small validation sets in jackknife mode."""
+        """Test warning for small validation sets in random_subsampling mode."""
         # Use balanced classes to ensure both classes appear in validation splits,
         # which is required for log_loss scoring
         small_data = pd.DataFrame(
@@ -532,12 +532,12 @@ class TestPublicFeatureImportance:
                 small_data,
                 x="x",
                 y="y",
-                mode="jackknife",
-                jackknife_fraction=0.8,
+                mode="random_subsampling",
+                subsampling_fraction=0.8,
                 iterations=5,
             )
 
-        assert result["mode"] == "jackknife"
+        assert result["mode"] == "random_subsampling"
 
         with pytest.warns(UserWarning, match="The validation set is small"):
             result = feature_importance(
@@ -569,11 +569,11 @@ class TestPublicFeatureImportance:
                     large_data,
                     x="x",
                     y="y",
-                    mode="jackknife",
-                    jackknife_fraction=0.8,
+                    mode="random_subsampling",
+                    subsampling_fraction=0.8,
                     iterations=5,
                 )
-                assert result["mode"] == "jackknife"
+                assert result["mode"] == "random_subsampling"
             except UserWarning as e:
                 if "small" in str(e).lower():
                     pytest.fail("Unexpected small validation warning")
@@ -623,28 +623,28 @@ class TestUncertaintyEdgeCases:
         assert len(axs) == 2
         plt.close()
 
-    def test_high_jackknife_fraction(self, binary_sample_data):
-        """Test with high jackknife fraction."""
+    def test_high_subsampling_fraction(self, binary_sample_data):
+        """Test with high subsampling fraction."""
         fig, axs = uncertainty_plot(
             binary_sample_data,
             "x",
             "y",
-            mode="jackknife",
-            jackknife_fraction=0.95,
+            mode="random_subsampling",
+            subsampling_fraction=0.95,
             iterations=10,
         )
 
         assert len(axs) == 2
         plt.close()
 
-    def test_low_jackknife_fraction(self, binary_sample_data):
-        """Test with low jackknife fraction."""
+    def test_low_subsampling_fraction(self, binary_sample_data):
+        """Test with low subsampling fraction."""
         fig, axs = uncertainty_plot(
             binary_sample_data,
             "x",
             "y",
-            mode="jackknife",
-            jackknife_fraction=0.5,
+            mode="random_subsampling",
+            subsampling_fraction=0.5,
             iterations=10,
         )
 

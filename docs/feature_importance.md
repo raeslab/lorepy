@@ -6,7 +6,7 @@ Lorepy provides statistical assessment of how strongly your x-feature is associa
 
 The function uses a robust resampling approach combined with sklearn's optimized permutation importance:
 
-1. **Bootstrap/Jackknife Sampling**: Creates multiple subsamples of your data (default: 100 iterations)
+1. **Bootstrap/Random Subsampling**: Creates multiple subsamples of your data (default: 100 iterations)
 2. **Permutation Importance**: For each subsample, uses sklearn's `permutation_importance` with proper cross-validation to avoid data leakage
 3. **Feature Shuffling**: Randomly permutes the x-feature values while keeping confounders intact
 4. **Performance Assessment**: Measures log loss increase using statistically sound train/test splits
@@ -51,7 +51,7 @@ stats = feature_importance(
     y="disease",
     confounders=[("bmi", 25), ("sex", "female")],  # Control for these variables
     clf=SVC(probability=True),                      # Use SVM instead of logistic regression
-    mode="jackknife",                              # Use jackknife instead of bootstrap
+    mode="random_subsampling",                      # Use random subsampling instead of bootstrap
     iterations=200                                 # More iterations for precision
 )
 

@@ -188,7 +188,7 @@ plt.show()
 
 From loreplots it isn't possible to assess how certain we are of the prevalence of each group across the range. To
 provide a view into this there is a function ```uncertainty_plot```, which can be used as shown below. This will use
-```resampling``` (or ```jackknifing```) to determine the 50% and 95% interval of predicted values and show these in a
+```resampling``` (or ```random subsampling```) to determine the 50% and 95% interval of predicted values and show these in a
 multi-panel plot with one plot per category.
 
 ```python
