@@ -23,7 +23,11 @@ stats = feature_importance(
 print(stats)
 
 stats = feature_importance(
-    data=iris_df, x="sepal width (cm)", y="species", iterations=100, mode="random_subsampling"
+    data=iris_df,
+    x="sepal width (cm)",
+    y="species",
+    iterations=100,
+    mode="random_subsampling",
 )
 print(stats)
 

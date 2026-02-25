@@ -322,11 +322,21 @@ class TestGetFeatureImportance:
 
         # Different fractions should produce different results
         result_80 = _get_feature_importance(
-            "x", X_reg, y_reg, mode="random_subsampling", subsampling_fraction=0.8, iterations=10
+            "x",
+            X_reg,
+            y_reg,
+            mode="random_subsampling",
+            subsampling_fraction=0.8,
+            iterations=10,
         )
 
         result_50 = _get_feature_importance(
-            "x", X_reg, y_reg, mode="random_subsampling", subsampling_fraction=0.5, iterations=10
+            "x",
+            X_reg,
+            y_reg,
+            mode="random_subsampling",
+            subsampling_fraction=0.5,
+            iterations=10,
         )
 
         # Both should produce valid results
