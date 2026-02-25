@@ -219,11 +219,9 @@ class TestGetFeatureImportance:
     def test_mode_resample(self, binary_sample_data):
         """Test resample mode."""
         X_reg, y_reg, _ = _prepare_data(binary_sample_data, "x", "y", [])
-
-        with pytest.warns(UserWarning, match="Bootstrap resampling mode"):
-            result = _get_feature_importance(
-                "x", X_reg, y_reg, mode="resample", iterations=10
-            )
+        result = _get_feature_importance(
+            "x", X_reg, y_reg, mode="resample", iterations=10
+        )
 
         assert result["mode"] == "resample"
 
@@ -490,15 +488,6 @@ class TestPublicFeatureImportance:
 
         assert result["mode"] == "jackknife"
 
-    def test_resample_mode_warning(self, binary_sample_data):
-        """Test that resample mode issues a warning."""
-        with pytest.warns(UserWarning, match="Bootstrap resampling mode"):
-            result = feature_importance(
-                binary_sample_data, x="x", y="y", mode="resample", iterations=10
-            )
-
-        assert result["mode"] == "resample"
-
     def test_small_validation_set_warning(self):
         """Test warning for small validation sets in jackknife mode."""
         small_data = pd.DataFrame(
@@ -508,7 +497,7 @@ class TestPublicFeatureImportance:
             }
         )
 
-        with pytest.warns(UserWarning, match="Jackknife validation set is small"):
+        with pytest.warns(UserWarning, match="The validation set is small"):
             result = feature_importance(
                 small_data,
                 x="x",
@@ -519,6 +508,18 @@ class TestPublicFeatureImportance:
             )
 
         assert result["mode"] == "jackknife"
+
+        with pytest.warns(UserWarning, match="The validation set is small"):
+            result = feature_importance(
+                small_data,
+                x="x",
+                y="y",
+                mode="resample",
+                resample_validation_fraction=0.2,
+                iterations=5,
+            )
+
+        assert result["mode"] == "resample"
 
     def test_no_warning_adequate_validation(self):
         """Test no warning for adequate validation sets."""

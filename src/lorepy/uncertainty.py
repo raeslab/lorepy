@@ -82,8 +82,9 @@ def _get_feature_importance(
     x: str,
     X_reg,
     y_reg,
-    mode="resample",
+    mode="jackknife",
     jackknife_fraction: float = 0.8,
+    resample_validation_fraction: float = 0.2,
     iterations: int = 100,
     clf=None,
 ):
@@ -96,6 +97,7 @@ def _get_feature_importance(
     :param y_reg: Target variable.
     :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
     :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
+    :param resample_validation_fraction: Fraction of data to use for validation in resampling mode (only used if mode="resample").
     :param iterations: Number of resampling or jackknife iterations.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
     :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, and significance metrics.
@@ -103,38 +105,31 @@ def _get_feature_importance(
 
     importance_scores = []
 
-    # Issue warnings about statistical considerations for different modes
-    if mode == "resample":
-        warnings.warn(
-            "Bootstrap resampling mode uses the same data for training and validation, "
-            "which may lead to overoptimistic importance scores with some models. "
-            "Consider using mode='jackknife' for more conservative estimates with proper train/test splits.",
-            UserWarning,
-            stacklevel=3,
-        )
-
     for i in range(iterations):
         if mode == "jackknife":
             X_keep, X_val, y_keep, y_val = train_test_split(
                 X_reg, y_reg, train_size=jackknife_fraction
             )
-
-            # Check for small validation sets that may affect statistical reliability
-            if len(y_val) < 20:
-                warnings.warn(
-                    f"Jackknife validation set is small (n={len(y_val)}). "
-                    f"Small validation sets may lead to unreliable importance estimates. "
-                    f"Consider increasing jackknife_fraction (currently {jackknife_fraction}) "
-                    f"or using a larger dataset for more stable results.",
-                    UserWarning,
-                    stacklevel=3,
-                )
         elif mode == "resample":
-            X_keep, y_keep = resample(X_reg, y_reg, replace=True)
-            X_val, y_val = X_reg, y_reg  # Use full data for validation
+            X_keep, X_val, y_keep, y_val = train_test_split(
+                X_reg, y_reg, train_size=1-resample_validation_fraction
+            )
+            X_keep, y_keep = resample(X_keep, y_keep, replace=True)
         else:
             raise NotImplementedError(
                 f"Mode {mode} is unsupported, only jackknife and resample are valid modes"
+            )
+
+
+        # Check for small validation sets that may affect statistical reliability
+        if len(y_val) < 20:
+            warnings.warn(
+                f"The validation set is small (n={len(y_val)}). "
+                f"Small validation sets may lead to unreliable importance estimates. "
+                f"Consider decreasing jackknife_fraction (currently {jackknife_fraction}), increasing resample_validation_fraction (currently {resample_validation_fraction}), "
+                f"or using a larger dataset for more stable results.",
+                UserWarning,
+                stacklevel=3,
             )
 
         # Fit model and use sklearn's permutation_importance
@@ -279,6 +274,7 @@ def feature_importance(
     y: str,
     mode="resample",
     jackknife_fraction=0.8,
+    resample_validation_fraction=0.2,
     iterations=100,
     confounders=None,
     clf=None,
@@ -296,6 +292,7 @@ def feature_importance(
     :param y: The name of the target variable.
     :param mode: Method for uncertainty estimation. Either "resample" (bootstrap) or "jackknife".
     :param jackknife_fraction: Fraction of data to keep in each jackknife iteration (only used if mode="jackknife").
+    :param resample_validation_fraction: Fraction of data to use for validation in resampling mode (only used if mode="resample").
     :param iterations: Number of resampling or jackknife iterations.
     :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
@@ -326,6 +323,7 @@ def feature_importance(
         y_reg=y_reg,
         mode=mode,
         jackknife_fraction=jackknife_fraction,
+        resample_validation_fraction=resample_validation_fraction,
         iterations=iterations,
         clf=clf,
     )
