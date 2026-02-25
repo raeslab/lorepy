@@ -7,6 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.utils import resample
 from sklearn.inspection import permutation_importance
+from sklearn.metrics import log_loss
 
 from lorepy.lorepy import _get_area_df, _prepare_data
 
@@ -90,7 +91,9 @@ def _get_feature_importance(
 ):
     """
     Estimates the importance of the x-feature in predicting class labels using permutation-based
-    feature importance with resampling or jackknife methods. Uses accuracy as the performance metric.
+    feature importance with resampling or jackknife methods. Uses log loss (cross-entropy) as the
+    performance metric, which evaluates the full predicted probability distribution rather than
+    just hard class predictions.
 
     :param x: Name of the feature variable to analyze for importance.
     :param X_reg: Feature matrix for regression/classification.
@@ -100,12 +103,12 @@ def _get_feature_importance(
     :param resample_validation_fraction: Fraction of data to use for validation in resampling mode (only used if mode="resample").
     :param iterations: Number of resampling or jackknife iterations.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted accuracy statistics, and significance metrics.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted log loss statistics, and significance metrics.
     """
 
     importance_scores = []
-    validation_accuracies = []
-    permuted_accuracies = []
+    validation_log_losses = []
+    permuted_log_losses = []
 
     for i in range(iterations):
         if mode == "jackknife":
@@ -138,37 +141,41 @@ def _get_feature_importance(
         lg.fit(X_keep, y_keep)
 
         # Use permutation_importance to get feature importance for first feature (x)
-        # This handles proper train/test splits internally and avoids training data leakage
+        # Using neg_log_loss to evaluate the full probability distribution rather than
+        # just hard class predictions, which is more appropriate for lorepy's probability-based plots
         perm_result = permutation_importance(
             lg,
             X_val,
             y_val,
             n_repeats=1,  # We handle iterations in outer loop
             random_state=None,  # Allow randomness for each iteration
-            scoring="accuracy",
+            scoring="neg_log_loss",
             n_jobs=1,
         )
 
         # Extract importance for first feature (x-feature)
+        # importance = neg_log_loss_original - neg_log_loss_permuted
+        # Positive importance means permuting the feature increases log loss (worsens predictions)
         importance = perm_result.importances_mean[0]
         importance_scores.append(importance)
 
-        # Track validation and permuted accuracies
-        val_accuracy = lg.score(X_val, y_val)
-        validation_accuracies.append(val_accuracy)
-        permuted_accuracies.append(val_accuracy - importance)
+        # Track validation and permuted log losses
+        val_log_loss = log_loss(y_val, lg.predict_proba(X_val), labels=lg.classes_)
+        validation_log_losses.append(val_log_loss)
+        # Since importance = (-val_log_loss) - (-perm_log_loss) = perm_log_loss - val_log_loss
+        permuted_log_losses.append(val_log_loss + importance)
 
     importance_scores = np.array(importance_scores)
-    validation_accuracies = np.array(validation_accuracies)
-    permuted_accuracies = np.array(permuted_accuracies)
+    validation_log_losses = np.array(validation_log_losses)
+    permuted_log_losses = np.array(permuted_log_losses)
 
     # Calculate statistics
     mean_importance = np.mean(importance_scores)
     std_importance = np.std(importance_scores)
-    mean_validation_accuracy = np.mean(validation_accuracies)
-    std_validation_accuracy = np.std(validation_accuracies)
-    mean_permuted_accuracy = np.mean(permuted_accuracies)
-    std_permuted_accuracy = np.std(permuted_accuracies)
+    mean_validation_log_loss = np.mean(validation_log_losses)
+    std_validation_log_loss = np.std(validation_log_losses)
+    mean_permuted_log_loss = np.mean(permuted_log_losses)
+    std_permuted_log_loss = np.std(permuted_log_losses)
     ci_95_low = np.percentile(importance_scores, 2.5)
     ci_95_high = np.percentile(importance_scores, 97.5)
 
@@ -189,10 +196,10 @@ def _get_feature_importance(
         "std_importance": std_importance,
         "importance_95ci_low": ci_95_low,
         "importance_95ci_high": ci_95_high,
-        "mean_validation_accuracy": mean_validation_accuracy,
-        "std_validation_accuracy": std_validation_accuracy,
-        "mean_permuted_accuracy": mean_permuted_accuracy,
-        "std_permuted_accuracy": std_permuted_accuracy,
+        "mean_validation_log_loss": mean_validation_log_loss,
+        "std_validation_log_loss": std_validation_log_loss,
+        "mean_permuted_log_loss": mean_permuted_log_loss,
+        "std_permuted_log_loss": std_permuted_log_loss,
         "proportion_positive": significant_positive,
         "proportion_negative": significant_negative,
         "p_value": p_value,
@@ -297,7 +304,9 @@ def feature_importance(
 ):
     """
     Estimates the importance of a feature in predicting class labels using permutation-based
-    feature importance with resampling or jackknife methods. Uses accuracy as the performance metric.
+    feature importance with resampling or jackknife methods. Uses log loss (cross-entropy) as the
+    performance metric, which evaluates the full predicted probability distribution rather than
+    just hard class predictions.
 
     This function provides statistical assessment of whether the x-feature is significantly
     associated with the class distribution (y-variable). Higher importance scores indicate
@@ -312,7 +321,7 @@ def feature_importance(
     :param iterations: Number of resampling or jackknife iterations.
     :param confounders: List of tuples (feature, reference value) pairs representing confounder features and their reference values.
     :param clf: Classifier to use for fitting. If None, uses LogisticRegression.
-    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted accuracy statistics, and significance metrics.
+    :return: Dictionary containing feature importance statistics including mean importance, confidence intervals, validation/permuted log loss statistics, and significance metrics.
 
     Example:
         >>> import pandas as pd

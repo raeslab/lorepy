@@ -205,7 +205,7 @@ This also supports custom colors, ranges and classifiers. More examples are avai
 
 ### Feature Importance Analysis
 
-Lorepy provides statistical assessment of how strongly your x-feature is associated with the class distribution using the `feature_importance` function. This uses **permutation-based feature importance** to test whether the relationship you see in your loreplot is statistically significant.
+Lorepy provides statistical assessment of how strongly your x-feature is associated with the class distribution using the `feature_importance` function. This uses **permutation-based feature importance** with **log loss (cross-entropy)** as the scoring metric to test whether the relationship you see in your loreplot is statistically significant. Log loss evaluates the full predicted probability distribution rather than just hard class predictions, making it well-suited for lorepy's probability-based visualizations.
 
 #### How it Works
 
@@ -214,7 +214,7 @@ The function uses a robust resampling approach combined with sklearn's optimized
 1. **Bootstrap/Jackknife Sampling**: Creates multiple subsamples of your data (default: 100 iterations)
 2. **Permutation Importance**: For each subsample, uses sklearn's `permutation_importance` with proper cross-validation to avoid data leakage
 3. **Feature Shuffling**: Randomly permutes the x-feature values while keeping confounders intact
-4. **Performance Assessment**: Measures accuracy drop using statistically sound train/test splits
+4. **Performance Assessment**: Measures log loss increase using statistically sound train/test splits
 5. **Statistical Summary**: Aggregates results across all iterations to provide confidence intervals and significance testing
 
 This approach works with **any sklearn classifier** (LogisticRegression, SVM, RandomForest, etc.) and properly handles confounders by keeping them constant during shuffling. The implementation uses sklearn's battle-tested permutation importance algorithm for reliable, unbiased results.
@@ -232,13 +232,13 @@ print(stats['interpretation'])
 
 The function returns a dictionary with the following key statistics:
 
-- **`mean_importance`**: Average accuracy drop when x-feature is shuffled (higher = more important)
+- **`mean_importance`**: Average log loss increase when x-feature is shuffled (higher = more important)
 - **`std_importance`**: Standard deviation of importance across iterations
 - **`importance_95ci_low/high`**: 95% confidence interval for the importance estimate
-- **`mean_validation_accuracy`**: Mean accuracy on the validation data across iterations
-- **`std_validation_accuracy`**: Standard deviation of the validation accuracy
-- **`mean_permuted_accuracy`**: Mean accuracy on the permuted data across iterations
-- **`std_permuted_accuracy`**: Standard deviation of the permuted accuracy
+- **`mean_validation_log_loss`**: Mean log loss on the validation data across iterations (lower = better)
+- **`std_validation_log_loss`**: Standard deviation of the validation log loss
+- **`mean_permuted_log_loss`**: Mean log loss on the permuted data across iterations (lower = better)
+- **`std_permuted_log_loss`**: Standard deviation of the permuted log loss
 - **`proportion_positive`**: Fraction of iterations where importance > 0 (feature helps prediction)
 - **`proportion_negative`**: Fraction of iterations where importance < 0 (feature hurts prediction)
 - **`p_value`**: Empirical p-value for statistical significance (< 0.05 typically considered significant)
