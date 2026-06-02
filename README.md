@@ -2,14 +2,14 @@
 
 # lorepy: Logistic Regression Plots for Python
 
-Logistic Regression plots are used to plot the distribution of a categorical dependent variable in function of a 
+Logistic Regression plots are used to plot the distribution of a categorical dependent variable as a function of a 
 continuous independent variable.
 
 If you prefer an R implementation of this package, have a look at [loreplotr](https://github.com/raeslab/loreplotr).
 
 ![LoRePlot example on Iris Dataset](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot.png)
 
-## Why use lorepy ?
+## Why use lorepy?
 
 Lorepy offers distinct advantages over traditional methods like stacked bar plots. By employing a linear model, Lorepy
 captures overall trends across the entire feature range. It avoids arbitrary cut-offs and segmentation, enabling the
@@ -33,7 +33,7 @@ pip install lorepy
 
 ## Usage
 
-Data needs to be provided as a DataFrame and the columns for the x (independent continuous) and y (dependant categorical)
+Data needs to be provided as a DataFrame and the columns for the x (independent continuous) and y (dependent categorical)
 variables need to be defined. Here the iris dataset is loaded and converted to an appropriate DataFrame. Once the data
 is in shape it can be plotted using a single line of code ```loreplot(data=iris_df, x="sepal width (cm)", y="species")```.
 
@@ -182,7 +182,7 @@ loreplot(data=iris_df, x="sepal width (cm)", y="species", jitter=0.05)
 plt.savefig("./docs/img/loreplot_jitter.png", dpi=150)
 plt.show()
 ```
-![Loreplot with a confounder](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_jitter.png)
+![Loreplot with jitter applied to the x-coordinates](https://raw.githubusercontent.com/raeslab/lorepy/main/docs/img/loreplot_jitter.png)
 
 ### Assess uncertainty
 

@@ -37,7 +37,7 @@ python setup.py sdist bdist_wheel
 
 ### Push the package to PyPi
 
-**Note** that these commands will upload the code to publicly available platforms, use with caution !
+**Note** that these commands will upload the code to publicly available platforms, use with caution!
 
 This will require the twine package, install twine using ```pip install twine``` if needed.
 
